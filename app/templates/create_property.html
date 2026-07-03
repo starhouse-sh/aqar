@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content-section">
+    <form method="POST" action="{{ url_for('main.create_property') }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">{{ legend if legend else 'اضافة عقار جديد' }}</legend>
+            
+            <div class="mb-3">
+                {{ form.title.label(class="form-label") }}
+                {% if form.title.errors %}
+                    {{ form.title(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.title.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.title(class="form-control") }}
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form.description.label(class="form-label") }}
+                {% if form.description.errors %}
+                    {{ form.description(class="form-control is-invalid", rows="5") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.description.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.description(class="form-control", rows="5") }}
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.price.label(class="form-label") }}
+                    {% if form.price.errors %}
+                        {{ form.price(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.price.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.price(class="form-control") }}
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    {{ form.location.label(class="form-label") }}
+                    {% if form.location.errors %}
+                        {{ form.location(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.location.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.location(class="form-control") }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ضيف دول هنا بالظبط 👇 -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.type.label(class="form-label") }}
+                    {% if form.type.errors %}
+                        {{ form.type(class="form-select is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.type.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.type(class="form-select") }}
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    {{ form.property_type.label(class="form-label") }}
+                    {% if form.property_type.errors %}
+                        {{ form.property_type(class="form-select is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.property_type.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.property_type(class="form-select") }}
+                    {% endif %}
+                </div>
+            </div>
+            <!-- لحد هنا 👆 -->
+
+            <div class="mb-3">
+                {{ form.pictures.label(class="form-label") }}
+                {{ form.pictures(class="form-control", multiple=True) }}
+                {% if form.pictures.errors %}
+                    {% for error in form.pictures.errors %}
+                        <span class="text-danger">{{ error }}</span><br>
+                    {% endfor %}
+                {% endif %}
+                <small class="text-muted">يمكنك اختيار اكثر من صورة. الصيغ المسموحة: jpg, png, jpeg, webp</small>
+            </div>
+
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+{% endblock content %}

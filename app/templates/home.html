@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">بحث عن عقار</h5>
+                <form method="GET" action="{{ url_for('main.home') }}">
+                    <div class="row g-3">
+                        <div class="col-md-3">{{ form.city(class="form-control", placeholder="المدينة") }}</div>
+                        <div class="col-md-2">{{ form.type(class="form-select") }}</div>
+                        <div class="col-md-2">{{ form.property_type(class="form-select") }}</div>
+                        <div class="col-md-2">{{ form.min_price(class="form-control", placeholder="السعر من") }}</div>
+                        <div class="col-md-2">{{ form.max_price(class="form-control", placeholder="السعر إلى") }}</div>
+                        <div class="col-md-1">{{ form.submit(class="btn btn-primary w-100") }}</div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="mb-4">أحدث العقارات</h2>
+{% if properties.items %}
+    <div class="row">
+        {% for property in properties.items %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if property.images %}
+    <img src="{{ url_for('static', filename='property_pics/' + property.images[0].image_file) }}" class="card-img-top" style="height: 220px; object-fit: cover;">
+{% else %}
+    <img src="{{ url_for('static', filename='property_pics/default.jpg') }}" class="card-img-top" style="height: 220px; object-fit: cover;">
+{% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ property.title }}</h5>
+                    <p class="card-text">
+                        <span class="badge bg-{% if property.type == 'sale' %}success{% else %}warning{% endif %}">
+                            {% if property.type == 'sale' %}للبيع{% else %}للإيجار{% endif %}
+                        </span>
+                        <span class="badge bg-info">
+                            {% if property.property_type == 'apartment' %}شقة
+                            {% elif property.property_type == 'villa' %}فيلا
+                            {% elif property.property_type == 'land' %}أرض
+                            {% elif property.property_type == 'office' %}مكتب
+                            {% else %}محل{% endif %}
+                        </span>
+                    </p>
+                    <p class="card-text">
+                        <strong>{{ "{:,.0f}".format(property.price) }} جنيه</strong><br>
+                        <i class="bi bi-geo-alt"></i> {{ property.city }}<br>
+                        <i class="bi bi-aspect-ratio"></i> {{ property.area }} م²
+                        {% if property.rooms %} | <i class="bi bi-door-open"></i> {{ property.rooms }} غرف{% endif %}
+                    </p>
+                    <a href="{{ url_for('main.property_detail', property_id=property.id) }}">التفاصيل</a>
+                </div>
+                <div class="card-footer text-muted">
+                    <small>{{ property.created_at.strftime('%Y-%m-%d') }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% for page_num in properties.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+      {% if page_num %}
+        {% if properties.page == page_num %}
+          <a class="btn btn-info mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
+        {% else %}
+          <a class="btn btn-outline-info mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
+        {% endif %}
+      {% else %}
+        ...
+      {% endif %}
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info">لا توجد عقارات حالياً</div>
+{% endif %}
+{% endblock content %}

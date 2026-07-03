@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>{{ property.title }}</h2>
+            
+            {% if property.images %}
+            <div id="carouselExample" class="carousel slide mb-3">
+                <div class="carousel-inner">
+                    {% for image in property.images %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                        <img src="{{ url_for('static', filename='property_pics/' + image.image_file) }}" class="d-block w-100" style="height: 400px; object-fit: cover;">
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+            {% endif %}
+            
+            <p><strong>السعر:</strong> {{ property.price }} جنيه</p>
+            <p><strong>الموقع:</strong> {{ property.location }}</p>
+            <p><strong>النوع:</strong> {{ property.type }} - {{ property.property_type }}</p>
+            <p><strong>الوصف:</strong></p>
+            <p>{{ property.description }}</p>
+            <p class="text-muted">تاريخ الاضافة: {{ property.created_at.strftime('%Y-%m-%d') }}</p>
+            
+            {% if property.user_id == current_user.id %}
+            <div class="mt-3">
+                <a class="btn btn-secondary btn-sm" href="{{ url_for('main.update_property', property_id=property.id) }}">تعديل</a>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">حذف</button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">حذف العقار</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">هل انت متأكد من حذف العقار؟</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">الغاء</button>
+        <form action="{{ url_for('main.delete_property', property_id=property.id) }}" method="POST">
+          <input class="btn btn-danger" type="submit" value="حذف">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
