@@ -5,7 +5,7 @@ from app import db, bcrypt
 from app.forms import RegistrationForm, LoginForm, PropertyForm
 from app.models import User, Property, PropertyImage
 from flask_login import login_user, current_user, logout_user, login_required
-
+from app.models import User, Property
 main = Blueprint('main', __name__)
 
 def save_picture(form_picture):
@@ -174,3 +174,29 @@ def delete_property(property_id):
 def account():
     user_properties = Property.query.filter_by(user_id=current_user.id).order_by(Property.created_at.desc()).all()
     return render_template('account.html', title='حسابي', properties=user_properties)
+
+from functools import wraps
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            flash('لازم تكون ادمن عشان تدخل الصفحة دي', 'danger')
+            return redirect(url_for('main.index'))  # ده صح عندك عشان login_view = 'main.login'
+        return f(*args, **kwargs)
+    return decorated_function
+
+@main.route('/admin')
+@login_required
+@admin_required
+def admin_dashboard():
+    users = User.query.all()
+    properties = Property.query.all()  # لو اسم الموديل مختلف قولي
+    total_users = User.query.count()
+    total_properties = Property.query.count()
+    
+    return render_template('admin/dashboard.html', 
+                         users=users, 
+                         properties=properties,
+                         total_users=total_users,
+                         total_properties=total_properties)
