@@ -13,7 +13,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     properties = db.relationship('Property', backref='author', lazy=True, cascade="all, delete-orphan")
-
+    is_admin = db.Column(db.Boolean, default=False)
     def _repr_(self):
         return f"User('{self.username}', '{self.email}')"
 
