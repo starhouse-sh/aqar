@@ -6,38 +6,37 @@ from flask_login import UserMixin
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-class User(db.Model, UserMixin):
-    __tablename__ = 'users'
+class User(db.Model, UserMixin):  # ← شيلت _tablename_
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='user')
     properties = db.relationship('Property', backref='author', lazy=True, cascade="all, delete-orphan")
-    is_admin = db.Column(db.Boolean, default=False)
+
     def _repr_(self):
         return f"User('{self.username}', '{self.email}')"
 
-class Property(db.Model):
-    __tablename__ = 'properties'
+class Property(db.Model):  # ← شيلت _tablename_
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text, nullable=False)
     location = db.Column(db.String(100), nullable=False)
-    type = db.Column(db.String(50), nullable=False)         
-    property_type = db.Column(db.String(50), nullable=False)     
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    type = db.Column(db.String(20), nullable=False)
+    property_type = db.Column(db.String(50), nullable=False)
+    is_approved = db.Column(db.Boolean, default=False, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # ← غيرت 'users.id' لـ 'user.id'
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     images = db.relationship('PropertyImage', backref='property', lazy=True, cascade="all, delete-orphan")
 
     def _repr_(self):
         return f"Property('{self.title}', '{self.price}')"
 
-class PropertyImage(db.Model):
-    __tablename__ = 'property_images'
+class PropertyImage(db.Model):  # ← شيلت _tablename_
     id = db.Column(db.Integer, primary_key=True)
-    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
-    property_id = db.Column(db.Integer, db.ForeignKey('properties.id'), nullable=False)
+    image_file = db.Column(db.String(100), nullable=False)
+    property_id = db.Column(db.Integer, db.ForeignKey('property.id'), nullable=False)  # ← غيرت 'properties.id' لـ 'property.id'
 
     def _repr_(self):
         return f"PropertyImage('{self.image_file}')"

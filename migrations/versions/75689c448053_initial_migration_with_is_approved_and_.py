@@ -1,8 +1,8 @@
-"""create all tables
+"""initial migration with is_approved and last_login
 
-Revision ID: 8309486c2176
+Revision ID: 75689c448053
 Revises: 
-Create Date: 2026-07-03 10:30:37.219638
+Create Date: 2026-07-06 01:27:11.533472
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8309486c2176'
+revision = '75689c448053'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,6 +23,10 @@ def upgrade():
     sa.Column('username', sa.String(length=20), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('password', sa.String(length=60), nullable=False),
+    sa.Column('role', sa.String(length=20), nullable=True),
+    sa.Column('last_login', sa.DateTime(), nullable=True),
+    sa.Column('is_admin', sa.Boolean(), nullable=True),
+    sa.Column('is_approved', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
@@ -33,7 +37,10 @@ def upgrade():
     sa.Column('price', sa.Integer(), nullable=False),
     sa.Column('description', sa.Text(), nullable=False),
     sa.Column('location', sa.String(length=100), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('type', sa.String(length=50), nullable=False),
+    sa.Column('property_type', sa.String(length=50), nullable=False),
+    sa.Column('date_posted', sa.DateTime(), nullable=False),
+    sa.Column('is_approved', sa.Boolean(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')

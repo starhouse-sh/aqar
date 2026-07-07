@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="content-section">
-    <form method="POST" action="{{ url_for('main.create_property') }}" enctype="multipart/form-data">
+    <form method="POST" action="
+    "enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <fieldset class="form-group">
             <legend class="border-bottom mb-4">{{ legend if legend else 'اضافة عقار جديد' }}</legend>
@@ -109,7 +110,7 @@
 
         </fieldset>
         <div class="form-group">
-            {{ form.submit(class="btn btn-primary") }}
+            {{ form.submit(class="btn btn-primary", value="حفظ التعديلات" if property else "اضافة العقار") }}
         </div>
     </form>
 </div>

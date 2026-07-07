@@ -47,29 +47,28 @@
                     </p>
                     <p class="card-text">
                         <strong>{{ "{:,.0f}".format(property.price) }} جنيه</strong><br>
-                        <i class="bi bi-geo-alt"></i> {{ property.city }}<br>
-                        <i class="bi bi-aspect-ratio"></i> {{ property.area }} م²
-                        {% if property.rooms %} | <i class="bi bi-door-open"></i> {{ property.rooms }} غرف{% endif %}
+                        <i class="bi bi-geo-alt"></i> {{ property.location }}<br>
+                        {# ← تعديل: حذفنا property.city و property.area و property.rooms لأنهم مش موجودين في الموديل #}
                     </p>
-                    <a href="{{ url_for('main.property_detail', property_id=property.id) }}">التفاصيل</a>
+                    <a href="{{ url_for('main.property_detail', property_id=property.id) }}" class="btn btn-primary btn-sm">التفاصيل</a>
                 </div>
                 <div class="card-footer text-muted">
-                    <small>{{ property.created_at.strftime('%Y-%m-%d') }}</small>
+                    <small>{{ property.date_posted.strftime('%Y-%m-%d') }}</small>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
-    
+
     {% for page_num in properties.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
       {% if page_num %}
         {% if properties.page == page_num %}
-          <a class="btn btn-info mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
+          <a class="btn btn-info mb-4" href="{{ url_for('main.home', page=page_num, **request.args) }}">{{ page_num }}</a>
         {% else %}
-          <a class="btn btn-outline-info mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
+          <a class="btn btn-outline-info mb-4" href="{{ url_for('main.home', page=page_num, **request.args) }}">{{ page_num }}</a>
         {% endif %}
       {% else %}
-        ...
+       ...
       {% endif %}
     {% endfor %}
 {% else %}

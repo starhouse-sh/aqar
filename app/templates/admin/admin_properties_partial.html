@@ -1,0 +1,47 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>العنوان</th>
+            <th>السعر</th>
+            <th>صاحب العقار</th>
+            <th>التاريخ</th>
+            <th>التحكم</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for prop in pending %}
+        <tr>
+            <td>{{ prop.id }}</td>
+            <td>{{ prop.title }}</td>
+            <td>{{ "{:,.0f}".format(prop.price) }} جنيه</td>
+            <td>{{ prop.author.username }}</td>
+            <td>{{ prop.date_posted.strftime('%Y-%m-%d') }}</td>
+            <td>
+                <a href="{{ url_for('main.property_detail', property_id=prop.id) }}" class="btn btn-sm btn-info">👁️ عرض</a>
+                
+                <form method="POST" action="{{ url_for('main.approve_property', property_id=prop.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-success">
+                        ✅ موافقة
+                    </button>
+                </form>
+                
+                <form method="POST" action="{{ url_for('main.delete_property', property_id=prop.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('متأكد عايز تمسح العقار؟')">
+                        🗑️ رفض ومسح
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6" class="text-center text-muted">لا توجد عقارات قيد المراجعة</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- تحديث العداد فوق -->
+<script>
+document.getElementById('pending-count').textContent = '{{ pending|length }}';
+</script>

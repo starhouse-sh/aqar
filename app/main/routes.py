@@ -19,28 +19,38 @@ def save_picture(form_picture):
 @main.route('/')
 @main.route('/home')
 def home():
-    properties = Property.query.order_by(Property.created_at.desc()).all()
+    properties = Property.query.filter_by(is_approved=True).all()  # ← ده أهم سطر
+    print(f"عدد العقارات المعروضة: {len(properties)}")  # ← ضيف ده عشان تتأكد
     return render_template('home.html', properties=properties)
 
-@main.route('/register', methods=['GET', 'POST'])
+@main_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
-    
-    form = RegisterForm()
-    if form.validate_on_submit():
-        hashed_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(
-            name=form.name.data,
-            email=form.email.data,
-            password=hashed_pw,
-            role=form.role.data
-        )
-        db.session.add(user)
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        # اعمل check الاول
+        user_by_email = User.query.filter_by(email=email).first()
+        if user_by_email:
+            flash('الايميل ده متسجل قبل كده، جرب تسجل دخول', 'danger')
+            return redirect(url_for('main.register'))
+        
+        user_by_username = User.query.filter_by(username=username).first()
+        if user_by_username:
+            flash('اسم المستخدم ده موجود، اختار اسم تاني', 'danger')
+            return redirect(url_for('main.register'))
+        
+        # لو كله تمام، اعمل اليوزر
+        hashed_password = generate_password_hash(password)
+        new_user = User(username=username, email=email, password=hashed_password)
+        db.session.add(new_user)
         db.session.commit()
-        flash('تم إنشاء حسابك بنجاح! تقدر تسجل دخول دلوقتي', 'success')
+        
+        flash('تم التسجيل بنجاح! سجل دخول دلوقتي', 'success')
         return redirect(url_for('main.login'))
-    return render_template('register.html', form=form)
+    
+    return render_template('register.html',form = form)
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
@@ -92,6 +102,7 @@ def new_property():
             city=form.city.data,
             description=form.description.data,
             image_file=image_file
+            is_approved=false
         )
         db.session.add(property)
         db.session.commit()

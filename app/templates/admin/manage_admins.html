@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>إدارة المشرفين</h2>
+    
+    <h4 class="mt-4">المشرفين الحاليين</h4>
+
+<!-- فورم بحث عن مستخدم لترقيته -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>ترقية مستخدم عادي</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('main.promote_user') }}">
+            <div class="row">
+                <div class="col-md-8">
+                    <input type="email" name="email" class="form-control" 
+                           placeholder="ابحث بايميل المستخدم..." required>
+                </div>
+                <div class="col-md-2">
+                    <select name="role" class="form-select">
+                        <option value="admin">ادمن</option>
+                        {% if current_user.role == 'super_admin' %}
+                        <option value="super_admin">سوبر ادمن</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100">ترقية</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>الايميل</th>
+            <th>الاسم</th>
+            <th>الدور</th>
+            <th>عدد العقارات</th>
+            <th>اخر دخول</th>
+            <th>اجراء</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for admin in admins %}
+        <tr>
+            <td>{{ admin.email }}</td>
+            <td>{{ admin.username }}</td>
+            <td>
+                {% if admin.role == 'super_admin' %}
+                    <span class="badge bg-danger">سوبر ادمن</span>
+                {% else %}
+                    <span class="badge bg-primary">ادمن</span>
+                {% endif %}
+            </td>
+            <td>{{ admin.properties|length }}</td>
+            <td>{{ admin.last_login.strftime('%Y-%m-%d') if admin.last_login else 'لم يسجل' }}</td>
+            <td>
+                <!-- الحماية: محدش يلغي سوبر ادمن + محدش يلغي نفسه -->
+                {% if admin.role != 'super_admin' and admin.id != current_user.id %}
+                <form method="POST" action="{{ url_for('main.demote_admin', user_id=admin.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-warning" 
+                            onclick="return confirm('متأكد تلغي اشراف {{ admin.username }}؟')">
+                        إلغاء الإشراف
+                    </button>
+                </form>
+                {% elif admin.id == current_user.id %}
+                    <span class="text-muted">ده انت</span>
+                {% else %}
+                    <span class="text-muted">محمي</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+    <h4 class="mt-5">ترقية مستخدم عادي</h4>
+    <form method="POST" action="/admin/promote">
+        <div class="row">
+            <div class="col-md-6">
+                <select name="user_id" class="form-select">
+                    {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.email }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="role" class="form-select">
+                    <option value="admin">ادمن</option>
+                    <option value="super_admin">سوبر ادمن</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success">ترقية</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
