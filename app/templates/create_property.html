@@ -1,117 +1,203 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="content-section">
-    <form method="POST" action="
-    "enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <fieldset class="form-group">
-            <legend class="border-bottom mb-4">{{ legend if legend else 'اضافة عقار جديد' }}</legend>
-            
-            <div class="mb-3">
-                {{ form.title.label(class="form-label") }}
-                {% if form.title.errors %}
-                    {{ form.title(class="form-control is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.title.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.title(class="form-control") }}
-                {% endif %}
-            </div>
-
-            <div class="mb-3">
-                {{ form.description.label(class="form-label") }}
-                {% if form.description.errors %}
-                    {{ form.description(class="form-control is-invalid", rows="5") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.description.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.description(class="form-control", rows="5") }}
-                {% endif %}
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    {{ form.price.label(class="form-label") }}
-                    {% if form.price.errors %}
-                        {{ form.price(class="form-control is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.price.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.price(class="form-control") }}
-                    {% endif %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <div class="card shadow-lg" style="border: none; border-radius: 15px;">
+                <div class="card-header" style="background: linear-gradient(135deg, #1a237e, #3949ab); color: white; border-radius: 15px 15px 0 0; padding: 20px;">
+                    <h3 class="mb-0" style="font-weight: 800;">
+                        <i class="bi bi-plus-circle"></i> {{ legend }}
+                    </h3>
                 </div>
-
-                <div class="col-md-6 mb-3">
-                    {{ form.location.label(class="form-label") }}
-                    {% if form.location.errors %}
-                        {{ form.location(class="form-control is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.location.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
+                <div class="card-body p-4">
+                    <form method="POST" action="" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- 1. الغرض ونوع العقار -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.type.label(class="form-label fw-bold") }}
+                                {{ form.type(class="form-select form-select-lg") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.property_type.label(class="form-label fw-bold") }}
+                                {{ form.property_type(class="form-select form-select-lg") }}
+                            </div>
                         </div>
-                    {% else %}
-                        {{ form.location(class="form-control") }}
-                    {% endif %}
+
+                        <hr style="margin: 20px 0;">
+
+                        <!-- 2. الموقع -->
+                        <div class="mb-3">
+                            {{ form.location.label(class="form-label fw-bold") }}
+                            {% if form.location.errors %}
+                                {{ form.location(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.location.errors %}<span>{{ error }}</span>{% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.location(class="form-control form-control-lg", placeholder="مثال: التجمع الخامس - القاهرة الجديدة") }}
+                            {% endif %}
+                        </div>
+
+                        <!-- 3. عنوان الاعلان -->
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label fw-bold") }}
+                            {% if form.title.errors %}
+                                {{ form.title(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}<span>{{ error }}</span>{% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.title(class="form-control form-control-lg", placeholder="مثال: شقة 200م للبيع في مدينتي") }}
+                            {% endif %}
+                        </div>
+
+                        <!-- 4. السعر + قابل للتفاوض -->
+                        <div class="row align-items-end">
+                            <div class="col-md-8 mb-3">
+                                {{ form.price.label(class="form-label fw-bold") }}
+                                {% if form.price.errors %}
+                                    {{ form.price(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.price.errors %}<span>{{ error }}</span>{% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.price(class="form-control form-control-lg", placeholder="السعر بالجنيه المصري") }}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check" style="padding: 15px; background-color: #f8f9fa; border-radius: 10px;">
+                                    {{ form.negotiable(class="form-check-input") }}
+                                    {{ form.negotiable.label(class="form-check-label fw-bold") }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr style="margin: 30px 0;">
+                        <h5 style="color: #1a237e; font-weight: 700; margin-bottom: 20px;">
+                            <i class="bi bi-house-door"></i> تفاصيل العقار
+                        </h5>
+
+                        <!-- 5. تفاصيل العقار: مساحة ثم غرف ثم حمامات -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                {{ form.area.label(class="form-label fw-bold") }}
+                                {% if form.area.errors %}
+                                    {{ form.area(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.area.errors %}<span>{{ error }}</span>{% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.area(class="form-control", placeholder="0") }}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.bedrooms.label(class="form-label fw-bold") }}
+                                {% if form.bedrooms.errors %}
+                                    {{ form.bedrooms(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.bedrooms.errors %}<span>{{ error }}</span>{% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.bedrooms(class="form-control", placeholder="0") }}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.bathrooms.label(class="form-label fw-bold") }}
+                                {% if form.bathrooms.errors %}
+                                    {{ form.bathrooms(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.bathrooms.errors %}<span>{{ error }}</span>{% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.bathrooms(class="form-control", placeholder="0") }}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.finishing.label(class="form-label fw-bold") }}
+                            {{ form.finishing(class="form-select") }}
+                        </div>
+
+                        <hr style="margin: 30px 0;">
+
+                        <!-- 6. وصف العقار -->
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label fw-bold") }}
+                            {% if form.description.errors %}
+                                {{ form.description(class="form-control is-invalid", rows="5") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.description.errors %}<span>{{ error }}</span>{% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.description(class="form-control", rows="5", placeholder="اكتب وصف تفصيلي للعقار... المميزات، الخدمات، القرب من...") }}
+                            {% endif %}
+                        </div>
+
+                        <hr style="margin: 30px 0;">
+                        <h5 style="color: #1a237e; font-weight: 700; margin-bottom: 20px;">
+                            <i class="bi bi-telephone"></i> بيانات التواصل
+                        </h5>
+
+                                               <!-- 7. أرقام التواصل -->
+<div class="row">
+    <div class="col-md-6 mb-3">
+        {{ form.phone.label(class="form-label fw-bold") }}
+        {% if form.phone.errors %}
+            {{ form.phone(class="form-control is-invalid", id="phone") }}
+            <div class="invalid-feedback">
+                {% for error in form.phone.errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+        {% else %}
+            {{ form.phone(class="form-control", id="phone", placeholder="010xxxxxxxx") }}
+        {% endif %}
+    </div>
+    <div class="col-md-6 mb-3">
+        {{ form.whatsapp.label(class="form-label fw-bold") }}
+        {{ form.whatsapp(class="form-control", id="whatsapp", placeholder="010xxxxxxxx") }}
+        <small class="text-muted">لو تركته فارغ هيكون نفس رقم الموبايل</small>
+    </div>
+
+
+                        <hr style="margin: 30px 0;">
+
+                        <!-- 8. الصور -->
+                        <div class="mb-4">
+                            {{ form.pictures.label(class="form-label fw-bold") }}
+                            {{ form.pictures(class="form-control", multiple=True) }}
+                            <small class="text-muted">يمكنك اختيار أكثر من صورة - الصورة الأولى هي الرئيسية</small>
+                        </div>
+
+                        <!-- زر الحفظ -->
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-lg", style="background-color: #1a237e; color: white; font-weight: bold; padding: 15px;") }}
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            <!-- ضيف دول هنا بالظبط 👇 -->
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    {{ form.type.label(class="form-label") }}
-                    {% if form.type.errors %}
-                        {{ form.type(class="form-select is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.type.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.type(class="form-select") }}
-                    {% endif %}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    {{ form.property_type.label(class="form-label") }}
-                    {% if form.property_type.errors %}
-                        {{ form.property_type(class="form-select is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.property_type.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.property_type(class="form-select") }}
-                    {% endif %}
-                </div>
-            </div>
-            <!-- لحد هنا 👆 -->
-
-            <div class="mb-3">
-                {{ form.pictures.label(class="form-label") }}
-                {{ form.pictures(class="form-control", multiple=True) }}
-                {% if form.pictures.errors %}
-                    {% for error in form.pictures.errors %}
-                        <span class="text-danger">{{ error }}</span><br>
-                    {% endfor %}
-                {% endif %}
-                <small class="text-muted">يمكنك اختيار اكثر من صورة. الصيغ المسموحة: jpg, png, jpeg, webp</small>
-            </div>
-
-        </fieldset>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary", value="حفظ التعديلات" if property else "اضافة العقار") }}
         </div>
-    </form>
+    </div>
 </div>
+<script>
+// لما يكتب رقم الموبايل، ينسخه تلقائي في الواتساب لو كان فاضي
+document.getElementById('phone').addEventListener('input', function() {
+    const whatsappField = document.getElementById('whatsapp');
+    // لو خانة الواتساب فاضية، انسخ فيها رقم الموبايل
+    if (whatsappField.value === '') {
+        whatsappField.value = this.value;
+    }
+});
+
+// لما يضغط حفظ، لو الواتساب فاضي املأه برقم الموبايل
+document.querySelector('form').addEventListener('submit', function() {
+    const phoneField = document.getElementById('phone');
+    const whatsappField = document.getElementById('whatsapp');
+    
+    if (whatsappField.value.trim() === '') {
+        whatsappField.value = phoneField.value;
+    }
+});
+</script>
 {% endblock content %}

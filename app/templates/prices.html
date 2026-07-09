@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 style="color: #1a237e; font-weight: 800;">مؤشر أسعار التجمع الخامس والقاهرة الجديدة</h1>
+        <p class="lead text-muted">متوسط سعر المتر - تحديث يوليو 2026</p>
+        <div class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 1rem; padding: 10px 20px;">
+            <i class="bi bi-info-circle"></i> الأسعار تقريبية وتختلف حسب التشطيب والموقع
+        </div>
+    </div>
+
+    <!-- التجمع الخامس -->
+    <div class="card shadow-sm mb-5" style="border: none; border-radius: 15px;">
+        <div class="card-header" style="background-color: #1a237e; color: white; border-radius: 15px 15px 0 0;">
+            <h3 class="mb-0"><i class="bi bi-geo-alt-fill"></i> التجمع الخامس - كمبوندات ومناطق</h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead style="background-color: #f8f9fa;">
+                        <tr>
+                            <th style="color: #1a237e; font-weight: bold;">المنطقة / الكمبوند</th>
+                            <th style="color: #1a237e; font-weight: bold;">شقق - سعر المتر</th>
+                            <th style="color: #1a237e; font-weight: bold;">فلل - سعر المتر</th>
+                            <th style="color: #1a237e; font-weight: bold;">ملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- الكمبوندات المغلقة -->
+                        <tr style="background-color: #fffbf0;"><td colspan="4" style="text-align: center; font-weight: bold; color: #1a237e;"><i class="bi bi-shield-fill-check"></i> الكمبوندات المغلقة</td></tr>
+                        <tr><td><strong>المصراوية لاك فيو</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>28,000 - 36,000 جنيه</td><td>32,000 - 45,000 جنيه</td><td>على البحيرة مباشرة</td></tr>
+                        <tr><td><strong>مفيدا</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>35,000 - 48,000 جنيه</td><td>42,000 - 60,000 جنيه</td><td>كمبوند فاخر</td></tr>
+                        <tr><td><strong>قطامية ديونز</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>30,000 - 40,000 جنيه</td><td>35,000 - 50,000 جنيه</td><td>جولف فيو</td></tr>
+                        <tr><td><strong>لافيستا سيتي</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>26,000 - 34,000 جنيه</td><td>30,000 - 42,000 جنيه</td><td>كمبوند متكامل</td></tr>
+                        <tr><td><strong>هايد بارك</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>32,000 - 45,000 جنيه</td><td>38,000 - 55,000 جنيه</td><td>مساحات خضراء واسعة</td></tr>
+                        <tr><td><strong>ماونتن فيو</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>34,000 - 47,000 جنيه</td><td>40,000 - 58,000 جنيه</td><td>هايد بارك</td></tr>
+                        <tr><td><strong>بالم هيلز قطامية</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>38,000 - 52,000 جنيه</td><td>45,000 - 65,000 جنيه</td><td>أعلى مستوى</td></tr>
+                        <tr><td><strong>سوديك إيست</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>29,000 - 38,000 جنيه</td><td>34,000 - 48,000 جنيه</td><td>قريب من الجامعة الأمريكية</td></tr>
+                        <tr><td><strong>ذا واتر واي</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>31,000 - 42,000 جنيه</td><td>36,000 - 52,000 جنيه</td><td>على النيل مباشرة</td></tr>
+                        <tr><td><strong>كايرو فيستيفال سيتي</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>36,000 - 50,000 جنيه</td><td>43,000 - 62,000 جنيه</td><td>مول ومكاتب</td></tr>
+                        <tr><td><strong>ستون بارك</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>27,000 - 35,000 جنيه</td><td>31,000 - 44,000 جنيه</td><td>كمبوند هادئ</td></tr>
+                        <tr><td><strong>ليك فيو</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>30,000 - 40,000 جنيه</td><td>35,000 - 50,000 جنيه</td><td>بحيرات صناعية</td></tr>
+                        <tr><td><strong>ميراج سيتي</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>25,000 - 33,000 جنيه</td><td>29,000 - 41,000 جنيه</td><td>أسعار مناسبة</td></tr>
+                        <tr><td><strong>ديار</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>24,000 - 32,000 جنيه</td><td>28,000 - 40,000 جنيه</td><td>تشطيبات فاخرة</td></tr>
+                        <tr><td><strong>الرياض سيتي</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>22,000 - 30,000 جنيه</td><td>26,000 - 38,000 جنيه</td><td>استثماري</td></tr>
+                        <tr><td><strong>تاج سيتي</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>33,000 - 46,000 جنيه</td><td>39,000 - 56,000 جنيه</td><td>مشروع جديد</td></tr>
+                        <tr><td><strong>زد إيست</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>31,000 - 43,000 جنيه</td><td>37,000 - 53,000 جنيه</td><td>أورا للتطوير</td></tr>
+                        <tr><td><strong>الباتيو</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>26,000 - 34,000 جنيه</td><td>30,000 - 43,000 جنيه</td><td>كمبوند عائلي</td></tr>
+                        <tr><td><strong>إعمار مصر</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>37,000 - 51,000 جنيه</td><td>44,000 - 63,000 جنيه</td><td>مطور إماراتي</td></tr>
+                        <tr><td><strong>سراي</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>28,000 - 37,000 جنيه</td><td>33,000 - 47,000 جنيه</td><td>مدينة نصر للإسكان</td></tr>
+                        
+                        <!-- المناطق العادية -->
+                        <tr style="background-color: #f8f9fa;"><td colspan="4" style="text-align: center; font-weight: bold; color: #1a237e;"><i class="bi bi-buildings"></i> المناطق السكنية</td></tr>
+                        <tr><td><strong>النرجس</strong></td><td>25,000 - 32,000 جنيه</td><td>28,000 - 38,000 جنيه</td><td>كمبوند راقي</td></tr>
+                        <tr><td><strong>الياسمين</strong></td><td>22,000 - 28,000 جنيه</td><td>25,000 - 35,000 جنيه</td><td>قريب من الجامعة الأمريكية</td></tr>
+                        <tr><td><strong>اللوتس</strong></td><td>28,000 - 35,000 جنيه</td><td>32,000 - 42,000 جنيه</td><td>كمبوند فاخر</td></tr>
+                        <tr><td><strong>البنفسج</strong></td><td>20,000 - 26,000 جنيه</td><td>23,000 - 30,000 جنيه</td><td>سكني هادئ</td></tr>
+                        <tr><td><strong>التمر حنة</strong></td><td>18,000 - 24,000 جنيه</td><td>20,000 - 28,000 جنيه</td><td>أسعار مناسبة</td></tr>
+                        <tr><td><strong>الأندلس</strong></td><td>24,000 - 30,000 جنيه</td><td>27,000 - 36,000 جنيه</td><td>قريب من الخدمات</td></tr>
+                        <tr><td><strong>المستثمرين الشمالية</strong></td><td>26,000 - 33,000 جنيه</td><td>30,000 - 40,000 جنيه</td><td>استثماري مميز</td></tr>
+                        <tr><td><strong>المستثمرين الجنوبية</strong></td><td>24,000 - 31,000 جنيه</td><td>28,000 - 37,000 جنيه</td><td>موقع استراتيجي</td></tr>
+                        <tr><td><strong>بيت الوطن</strong></td><td>19,000 - 25,000 جنيه</td><td>22,000 - 29,000 جنيه</td><td>مشروع جديد</td></tr>
+                        <tr><td><strong>الأحياء</strong></td><td>17,000 - 23,000 جنيه</td><td>19,000 - 26,000 جنيه</td><td>سكن اجتماعي</td></tr>
+                        <tr><td><strong>شارع التسعين</strong></td><td>30,000 - 45,000 جنيه</td><td>35,000 - 55,000 جنيه</td><td>تجاري وإداري</td></tr>
+                        <tr><td><strong>الحي الأول</strong></td><td>21,000 - 27,000 جنيه</td><td>24,000 - 32,000 جنيه</td><td>-</td></tr>
+                        <tr><td><strong>الحي الثاني</strong></td><td>20,000 - 26,000 جنيه</td><td>23,000 - 31,000 جنيه</td><td>-</td></tr>
+                        <tr><td><strong>الحي الثالث</strong></td><td>19,000 - 25,000 جنيه</td><td>22,000 - 30,000 جنيه</td><td>-</td></tr>
+                        <tr><td><strong>الحي الرابع</strong></td><td>18,000 - 24,000 جنيه</td><td>21,000 - 29,000 جنيه</td><td>-</td></tr>
+                        <tr><td><strong>الحي الخامس</strong></td><td>17,000 - 23,000 جنيه</td><td>20,000 - 28,000 جنيه</td><td>-</td></tr>
+                        <tr><td><strong>جاردينيا 1</strong></td><td>23,000 - 30,000 جنيه</td><td>26,000 - 36,000 جنيه</td><td>قريب من الدائري</td></tr>
+                        <tr><td><strong>جاردينيا 2</strong></td><td>22,000 - 29,000 جنيه</td><td>25,000 - 35,000 جنيه</td><td>منطقة هادئة</td></tr>
+                        <tr><td><strong>جاردينيا 3</strong></td><td>21,000 - 28,000 جنيه</td><td>24,000 - 34,000 جنيه</td><td>أسعار مناسبة</td></tr>
+                        <tr><td><strong>الجولف</strong></td><td>26,000 - 34,000 جنيه</td><td>30,000 - 42,000 جنيه</td><td>ملاعب جولف</td></tr>
+                        <tr><td><strong>المصراوية</strong></td><td>24,000 - 31,000 جنيه</td><td>27,000 - 38,000 جنيه</td><td>قريب من الجامعة</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- القاهرة الجديدة - باقي المناطق -->
+    <div class="card shadow-sm mb-5" style="border: none; border-radius: 15px;">
+        <div class="card-header" style="background-color: #FFD700; color: #1a237e; border-radius: 15px 15px 0 0;">
+            <h3 class="mb-0"><i class="bi bi-buildings-fill"></i> القاهرة الجديدة - مناطق أخرى</h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead style="background-color: #f8f9fa;">
+                        <tr>
+                            <th style="color: #1a237e; font-weight: bold;">المنطقة</th>
+                            <th style="color: #1a237e; font-weight: bold;">شقق - سعر المتر</th>
+                            <th style="color: #1a237e; font-weight: bold;">فلل - سعر المتر</th>
+                            <th style="color: #1a237e; font-weight: bold;">ملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>الرحاب</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>23,000 - 30,000 جنيه</td><td>26,000 - 36,000 جنيه</td><td>مدينة متكاملة</td></tr>
+                        <tr><td><strong>مدينتي</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>20,000 - 27,000 جنيه</td><td>23,000 - 32,000 جنيه</td><td>كمبوند متكامل</td></tr>
+                        <tr><td><strong>الشروق</strong></td><td>15,000 - 21,000 جنيه</td><td>17,000 - 24,000 جنيه</td><td>أسعار اقتصادية</td></tr>
+                        <tr><td><strong>بدر</strong></td><td>12,000 - 17,000 جنيه</td><td>14,000 - 20,000 جنيه</td><td>مدينة جديدة</td></tr>
+                        <tr><td><strong>المستقبل سيتي</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>16,000 - 22,000 جنيه</td><td>18,000 - 25,000 جنيه</td><td>تحت الإنشاء</td></tr>
+                        <tr><td><strong>العبور</strong></td><td>14,000 - 19,000 جنيه</td><td>16,000 - 22,000 جنيه</td><td>صناعي وسكني</td></tr>
+                        <tr><td><strong>هليوبوليس الجديدة</strong> <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.7rem;">كمبوند</span></td><td>17,000 - 23,000 جنيه</td><td>20,000 - 27,000 جنيه</td><td>قريب من المطار</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert" style="background-color: #fff3cd; border-color: #FFD700; color: #1a237e;">
+        <h5><i class="bi bi-exclamation-triangle"></i> تنبيه مهم</h5>
+        <p class="mb-0">الأسعار دي متوسطات تقريبية بتاريخ يوليو 2026. السعر الفعلي بيختلف حسب: التشطيب، الدور، الفيو، سنة البناء، وقربك من الخدمات. كلمنا عشان تقييم دقيق لعقارك.</p>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('main.contact') }}" class="btn btn-lg" style="background-color: #1a237e; color: white; font-weight: bold;">
+            <i class="bi bi-telephone"></i> عايز تقييم مجاني لعقارك؟
+        </a>
+    </div>
+</div>
+{% endblock content %}

@@ -26,7 +26,7 @@
                             <span class="badge bg-secondary">مستخدم</span>
                         {% endif %}
                     </p>
-                    <p class="mb-0"><strong>تاريخ التسجيل:</strong> {{ current_user.created_at.strftime('%Y-%m-%d') }}</p>
+                    <p class="mb-0"><strong>تاريخ التسجيل:</strong> {{ current_user.date_posted.strftime('%Y-%m-%d') }}</p>
                 </div>
             </div>
 
@@ -78,7 +78,7 @@
                                 </span>
                             </p>
                             <small class="text-muted">
-                                <i class="bi bi-clock"></i> {{ property.created_at.strftime('%Y-%m-%d') }}
+                                <i class="bi bi-clock"></i> {{ property.date_posted.strftime('%Y-%m-%d') }}
                             </small>
                         </div>
 

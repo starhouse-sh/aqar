@@ -1,77 +1,271 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">بحث عن عقار</h5>
-                <form method="GET" action="{{ url_for('main.home') }}">
-                    <div class="row g-3">
-                        <div class="col-md-3">{{ form.city(class="form-control", placeholder="المدينة") }}</div>
-                        <div class="col-md-2">{{ form.type(class="form-select") }}</div>
-                        <div class="col-md-2">{{ form.property_type(class="form-select") }}</div>
-                        <div class="col-md-2">{{ form.min_price(class="form-control", placeholder="السعر من") }}</div>
-                        <div class="col-md-2">{{ form.max_price(class="form-control", placeholder="السعر إلى") }}</div>
-                        <div class="col-md-1">{{ form.submit(class="btn btn-primary w-100") }}</div>
+
+<!-- Hero Section -->
+<div class="hero-section" style="background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%); color: white; padding: 80px 0; margin-top: -20px;">
+    <div class="container text-center">
+        <h1 style="font-size: 3rem; font-weight: 800; margin-bottom: 20px;">
+            اعثر على منزل أحلامك
+        </h1>
+        <p class="lead mb-4" style="font-size: 1.3rem; opacity: 0.9;">
+            آلاف العقارات في التجمع الخامس والقاهرة الجديدة
+        </p>
+        
+        <!-- Search Box -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form action="{{ url_for('main.home') }}" method="GET">
+                    <div class="input-group input-group-lg shadow-lg" style="border-radius: 50px; overflow: hidden;">
+                        <input type="text" 
+                               name="city" 
+                               class="form-control border-0" 
+                               placeholder="ابحث عن منطقة، كمبوند، أو نوع العقار..."
+                               style="padding: 20px 30px;"
+                               value="{{ request.args.get('city', '') }}">
+                        <button class="btn" 
+                                type="submit" 
+                                style="background-color: #FFD700; color: #1a237e; font-weight: bold; padding: 0 40px; border: none;">
+                            <i class="bi bi-search"></i> ابحث
+                        </button>
                     </div>
                 </form>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="row mt-5 g-4">
+            <div class="col-md-4">
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; backdrop-filter: blur(10px);">
+                    <h3 style="font-weight: 800; color: #FFD700;">500+</h3>
+                    <p class="mb-0">عقار متاح</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; backdrop-filter: blur(10px);">
+                    <h3 style="font-weight: 800; color: #FFD700;">50+</h3>
+                    <p class="mb-0">كمبوند</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; backdrop-filter: blur(10px);">
+                    <h3 style="font-weight: 800; color: #FFD700;">1000+</h3>
+                    <p class="mb-0">عميل سعيد</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<h2 class="mb-4">أحدث العقارات</h2>
-{% if properties.items %}
+<!-- أحدث العقارات المضافة -->
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 style="color: #1a237e; font-weight: 800; font-size: 2.5rem;">
+            <i class="bi bi-stars" style="color: #FFD700;"></i>
+            أحدث العقارات المضافة
+        </h2>
+        <p class="text-muted">اكتشف أفضل الفرص العقارية المتاحة الآن</p>
+    </div>
+
     <div class="row">
         {% for property in properties.items %}
+        <!-- كارت العقار الجديد -->
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                {% if property.images %}
-    <img src="{{ url_for('static', filename='property_pics/' + property.images[0].image_file) }}" class="card-img-top" style="height: 220px; object-fit: cover;">
-{% else %}
-    <img src="{{ url_for('static', filename='property_pics/default.jpg') }}" class="card-img-top" style="height: 220px; object-fit: cover;">
-{% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ property.title }}</h5>
-                    <p class="card-text">
-                        <span class="badge bg-{% if property.type == 'sale' %}success{% else %}warning{% endif %}">
-                            {% if property.type == 'sale' %}للبيع{% else %}للإيجار{% endif %}
-                        </span>
-                        <span class="badge bg-info">
-                            {% if property.property_type == 'apartment' %}شقة
-                            {% elif property.property_type == 'villa' %}فيلا
-                            {% elif property.property_type == 'land' %}أرض
-                            {% elif property.property_type == 'office' %}مكتب
-                            {% else %}محل{% endif %}
-                        </span>
-                    </p>
-                    <p class="card-text">
-                        <strong>{{ "{:,.0f}".format(property.price) }} جنيه</strong><br>
-                        <i class="bi bi-geo-alt"></i> {{ property.location }}<br>
-                        {# ← تعديل: حذفنا property.city و property.area و property.rooms لأنهم مش موجودين في الموديل #}
-                    </p>
-                    <a href="{{ url_for('main.property_detail', property_id=property.id) }}" class="btn btn-primary btn-sm">التفاصيل</a>
+            <a href="{{ url_for('main.property_detail', property_id=property.id) }}" 
+               class="text-decoration-none" 
+               style="color: inherit;">
+                
+                <div class="card h-100 shadow-sm" 
+                     style="border: none; border-radius: 15px; overflow: hidden; transition: all 0.3s; cursor: pointer;"
+                     onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.15)'"
+                     onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                    
+                    <!-- الصورة -->
+                    <div style="position: relative; height: 220px; overflow: hidden;">
+                        {% if property.images %}
+                        <img src="{{ url_for('static', filename='property_pics/' + property.images[0].image_file) }}" 
+                             class="card-img-top" 
+                             alt="{{ property.title }}"
+                             style="height: 100%; width: 100%; object-fit: cover;">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='img/default-property.jpg') }}" 
+                             class="card-img-top" 
+                             alt="{{ property.title }}"
+                             style="height: 100%; width: 100%; object-fit: cover;">
+                        {% endif %}
+                        
+                        <!-- بادج النوع -->
+                        <div style="position: absolute; top: 10px; right: 10px;">
+                            <span class="badge" style="background-color: #1a237e; font-size: 0.85rem; padding: 6px 12px; border-radius: 20px;">
+                                {{ property.property_type }}
+                            </span>
+                        </div>
+                        
+                        <!-- بادج للبيع/للإيجار -->
+                        <div style="position: absolute; top: 10px; left: 10px;">
+                            <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.85rem; padding: 6px 12px; border-radius: 20px;">
+                                {{ property.type }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- المحتوى -->
+                    <div class="card-body" style="padding: 15px;">
+                        <!-- العنوان -->
+                        <h5 class="card-title mb-2" style="color: #1a237e; font-weight: 700; font-size: 1.1rem; line-height: 1.4; height: 50px; overflow: hidden;">
+                            {{ property.title }}
+                        </h5>
+                        
+                        <!-- الموقع -->
+                        <p class="text-muted mb-2" style="font-size: 0.9rem;">
+                            <i class="bi bi-geo-alt-fill" style="color: #FFD700;"></i>
+                            {{ property.location }}
+                        </p>
+                        
+                        <!-- السعر - بدون مربع أزرق -->
+                        <div class="mb-3">
+                            <div style="color: #1a237e; font-size: 1.5rem; font-weight: 800;">
+                                {{ "{:,.0f}".format(property.price) }} جنيه
+                            </div>
+                        </div>
+                        
+                        <!-- 3 أيقونات صغيرة: سرير - بانيو - مساحة -->
+                        <div class="d-flex gap-3" style="border-top: 1px solid #e9ecef; padding-top: 12px; color: #6c757d; font-size: 0.95rem;">
+                            <!-- الغرف -->
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-house-door" style="font-size: 1rem; margin-left: 5px;"></i>
+                                <span style="font-weight: 600;">{{ property.bedrooms or 0 }}</span>
+                            </div>
+                            
+                            <!-- الحمامات -->
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-droplet" style="font-size: 1rem; margin-left: 5px;"></i>
+                                <span style="font-weight: 600;">{{ property.bathrooms or 0 }}</span>
+                            </div>
+                            
+                            <!-- المساحة -->
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-aspect-ratio" style="font-size: 1rem; margin-left: 5px;"></i>
+                                <span style="font-weight: 600;">{{ property.area or 0 }} م²</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- التاريخ في الفوتر -->
+                    <div class="card-footer bg-white" style="border-top: 1px solid #e9ecef; padding: 10px 15px;">
+                        <small class="text-muted">
+                            <i class="bi bi-clock"></i>
+                            {{ property.date_posted.strftime('%Y-%m-%d') }}
+                        </small>
+                    </div>
                 </div>
-                <div class="card-footer text-muted">
-                    <small>{{ property.date_posted.strftime('%Y-%m-%d') }}</small>
-                </div>
-            </div>
+            </a>
         </div>
         {% endfor %}
     </div>
 
-    {% for page_num in properties.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-      {% if page_num %}
-        {% if properties.page == page_num %}
-          <a class="btn btn-info mb-4" href="{{ url_for('main.home', page=page_num, **request.args) }}">{{ page_num }}</a>
-        {% else %}
-          <a class="btn btn-outline-info mb-4" href="{{ url_for('main.home', page=page_num, **request.args) }}">{{ page_num }}</a>
-        {% endif %}
-      {% else %}
-       ...
-      {% endif %}
-    {% endfor %}
-{% else %}
-    <div class="alert alert-info">لا توجد عقارات حالياً</div>
-{% endif %}
+    <!-- Pagination -->
+    {% if properties.pages > 1 %}
+    <div class="text-center mt-4">
+        {% for page_num in properties.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if page_num %}
+                {% if properties.page == page_num %}
+                    <a class="btn btn-sm mx-1" style="background-color: #1a237e; color: white;" href="{{ url_for('main.home', page=page_num, city=request.args.get('city', '')) }}">{{ page_num }}</a>
+                {% else %}
+                    <a class="btn btn-sm btn-outline-primary mx-1" href="{{ url_for('main.home', page=page_num, city=request.args.get('city', '')) }}">{{ page_num }}</a>
+                {% endif %}
+            {% else %}
+              ...
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- قسم المميزات -->
+<div style="background-color: #f8f9fa; padding: 80px 0;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 style="color: #1a237e; font-weight: 800; font-size: 2.5rem; margin-bottom: 15px;">
+                لماذا تختارنا؟
+            </h2>
+            <p class="text-muted" style="font-size: 1.1rem;">نحن الأفضل في سوق العقارات المصري</p>
+        </div>
+        <div class="row g-4">
+            <!-- كارت 1 - موثوقية → about.html -->
+            <div class="col-md-4">
+                <a href="{{ url_for('main.about') }}" class="text-decoration-none">
+                    <div class="feature-card" style="background: white; padding: 50px 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.4s ease; cursor: pointer; height: 100%;"
+                         onmouseover="this.style.transform='translateY(-15px)'; this.style.boxShadow='0 15px 40px rgba(26, 35, 126, 0.25)'; this.querySelector('svg').style.transform='scale(1.1) rotate(5deg)'"
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 5px 20px rgba(0,0,0,0.08)'; this.querySelector('svg').style.transform='scale(1) rotate(0deg)'">
+                        
+                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #1a237e, #3949ab); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 10px 25px rgba(26, 35, 126, 0.3);">
+                            <svg width="50" height="50" fill="#FFD700" viewBox="0 0 16 16" style="transition: all 0.4s ease;">
+                                <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.741 10.741 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 0 0 1-1.048-.625 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 0 0 1 2.185 1.43 62.456 0 0 1 5.072.56z"/>
+                                <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                            </svg>
+                        </div>
+                        <h4 style="color: #1a237e; font-weight: 800; margin-bottom: 15px; font-size: 1.4rem;">موثوقية كاملة</h4>
+                        <p class="text-muted" style="font-size: 1rem; line-height: 1.8;">جميع العقارات موثقة ومضمونة 100% من فريقنا المتخصص</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- كارت 2 - الأسعار → prices.html -->
+            <div class="col-md-4">
+                <a href="{{ url_for('main.prices') }}" class="text-decoration-none">
+                    <div class="feature-card" style="background: white; padding: 50px 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.4s ease; cursor: pointer; height: 100%;"
+                         onmouseover="this.style.transform='translateY(-15px)'; this.style.boxShadow='0 15px 40px rgba(26, 35, 126, 0.25)'; this.querySelector('svg').style.transform='scale(1.1) rotate(5deg)'"
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 5px 20px rgba(0,0,0,0.08)'; this.querySelector('svg').style.transform='scale(1) rotate(0deg)'">
+                        
+                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #1a237e, #3949ab); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 10px 25px rgba(26, 35, 126, 0.3);">
+                            <svg width="50" height="50" fill="#FFD700" viewBox="0 0 16 16" style="transition: all 0.4s ease;">
+                                <path d="M4 10.781c.148 1.667 1.513 2.85 3.591 3.004V15h1.043v-1.216c2.27-.179 3.678-1.438 3.678-3.3 0-1.59-.947-2.51-2.956-3.028l-.722-.187V3.467c1.122.11 1.879.714 2.07 1.616h1.47c-.166-1.6-1.54-2.748-3.54-2.875V1H7.591v1.233c-1.939.23-3.27 1.472-3.27 3.156 0 1.454.966 2.483 2.661 2.917l.61.162v4.031c-1.149-.17-1.94-.8-2.131-1.718H4zm3.391-3.836c-1.043-.263-1.6-.825-1.6-1.616 0-.944.704-1.641 1.8-1.828v3.495l-.2-.05zm1.591 1.872c1.287.323 1.852.859 1.852 1.769 0 1.097-.826 1.828-2.2 1.939V8.73l.348.086z"/>
+                            </svg>
+                        </div>
+                        <h4 style="color: #1a237e; font-weight: 800; margin-bottom: 15px; font-size: 1.4rem;">أفضل الأسعار</h4>
+                        <p class="text-muted" style="font-size: 1rem; line-height: 1.8;">أسعار تنافسية وعروض مميزة مع تقييم مجاني لعقارك</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- كارت 3 - الدعم → contact.html -->
+            <div class="col-md-4">
+                <a href="{{ url_for('main.contact') }}" class="text-decoration-none">
+                    <div class="feature-card" style="background: white; padding: 50px 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.4s ease; cursor: pointer; height: 100%;"
+                         onmouseover="this.style.transform='translateY(-15px)'; this.style.boxShadow='0 15px 40px rgba(26, 35, 126, 0.25)'; this.querySelector('svg').style.transform='scale(1.1) rotate(5deg)'"
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 5px 20px rgba(0,0,0,0.08)'; this.querySelector('svg').style.transform='scale(1) rotate(0deg)'">
+                        
+                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #1a237e, #3949ab); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; box-shadow: 0 10px 25px rgba(26, 35, 126, 0.3);">
+                            <svg width="50" height="50" fill="#FFD700" viewBox="0 0 16 16" style="transition: all 0.4s ease;">
+                                <path d="M8 1a5 5 0 0 0-5 5v1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a6 6 0 1 1 12 0v6a2.5 2.5 0 0 1-2.5 2.5H9.366a1 1 0 0 1-.866.5h-1a1 1 0 1 1 0-2h1a1 1 0 0 1 .866.5H11.5A1.5 0 0 0 13 12h-1a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1a1 1 0 0 1 1 1v6a1 1 0 0 0 1 1h-1a1 1 0 0 0-1-1v-3a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h1a1 1 0 0 1 1 1v.5a2.5 0 0 1-2.5 2.5h-1A1.5 0 0 1 5 12.5V12a1 1 0 0 0-1-1H3a2 2 0 0 1-2-2V6a5 5 0 0 0 5-5z"/>
+                            </svg>
+                        </div>
+                        <h4 style="color: #1a237e; font-weight: 800; margin-bottom: 15px; font-size: 1.4rem;">دعم 24/7</h4>
+                        <p class="text-muted" style="font-size: 1rem; line-height: 1.8;">فريق خدمة عملاء متاح على مدار الساعة لمساعدتك</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- CTA Section -->
+<div class="container py-5">
+    <div class="card text-center" style="border: none; border-radius: 20px; background: linear-gradient(135deg, #1a237e, #3949ab); color: white; padding: 60px 20px;">
+        <h2 style="font-weight: 800; margin-bottom: 20px;">عايز تبيع أو تأجر عقارك؟</h2>
+        <p class="lead mb-4" style="opacity: 0.9;">أضف عقارك مجاناً واوصل لآلاف المشترين</p>
+        <div>
+            <a href="{{ url_for('main.create_property') }}" 
+               class="btn btn-lg" 
+               style="background-color: #FFD700; color: #1a237e; font-weight: bold; padding: 15px 50px; border-radius: 50px; margin: 5px;">
+                <i class="bi bi-plus-circle"></i> أضف عقارك الآن
+            </a>
+            <a href="{{ url_for('main.contact') }}" 
+               class="btn btn-lg btn-outline-light" 
+               style="font-weight: bold; padding: 15px 50px; border-radius: 50px; margin: 5px;">
+                <i class="bi bi-telephone"></i> تواصل معنا
+            </a>
+        </div>
+    </div>
+</div>
+
 {% endblock content %}

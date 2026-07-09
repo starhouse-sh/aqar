@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Aqar Star House" style="height: 100px;" class="mb-4">
+                <h1 style="color: #1a237e; font-weight: 800;">من نحن - عقار ستار هاوس ⭐</h1>
+                <p class="lead" style="color: #FFD700; font-weight: 600;">نجوم عقارات التجمع الخامس</p>
+            </div>
+
+            <div class="card shadow-sm" style="border: none; border-radius: 15px;">
+                <div class="card-body p-5">
+                    <h3 style="color: #1a237e;" class="mb-4"><i class="bi bi-building"></i> مين احنا؟</h3>
+                    <p class="mb-4">
+                        <strong>Aqar Star House</strong> هي منصة عقارية متخصصة في التجمع الخامس والقاهرة الجديدة. 
+                        هدفنا نسهل عليك رحلة البحث عن بيت أحلامك أو استثمارك العقاري بأمان وشفافية كاملة.
+                    </p>
+
+                    <h3 style="color: #1a237e;" class="mb-4"><i class="bi bi-star-fill"></i> ليه تثق فينا؟</h3>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-check-circle-fill" style="color: #FFD700; font-size: 1.5rem; margin-left: 10px;"></i>
+                                <div>
+                                    <h5>عقارات موثقة 100%</h5>
+                                    <p class="text-muted">كل عقار بنراجعه ونتأكد من أوراقه قبل النشر</p>
+                                </div>
+                            </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-check-circle-fill" style="color: #FFD700; font-size: 1.5rem; margin-left: 10px;"></i>
+                                <div>
+                                    <h5>خبرة في التجمع</h5>
+                                    <p class="text-muted">فريقنا عايش في التجمع وعارف كل كمبوند شارع شارع</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-check-circle-fill" style="color: #FFD700; font-size: 1.5rem; margin-left: 10px;"></i>
+                                <div>
+                                    <h5>أسعار عادلة</h5>
+                                    <p class="text-muted">بنوفر مؤشر أسعار محدث عشان متتخدعش</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-check-circle-fill" style="color: #FFD700; font-size: 1.5rem; margin-left: 10px;"></i>
+                                <div>
+                                    <h5>دعم مجاني</h5>
+                                    <p class="text-muted">استشارة عقارية مجانية قبل ما تشتري أو تأجر</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: #1a237e;" class="mb-4"><i class="bi bi-bullseye"></i> رؤيتنا</h3>
+                    <p>
+                        نبقى المنصة رقم 1 في التجمع الخامس. عايزين نخلي شراء وبيع العقار أسهل وأأمن تجربة في مصر.
+                    </p>
+
+                    <div class="text-center mt-5">
+                        <a href="{{ url_for('main.contact') }}" class="btn btn-lg" style="background-color: #1a237e; color: white; font-weight: bold;">
+                            <i class="bi bi-telephone"></i> تواصل معنا
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

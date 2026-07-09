@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <h1 style="color: #1a237e; font-weight: 800;">تواصل مع Aqar Star House ⭐</h1>
+                <p class="lead text-muted">فريقنا جاهز لمساعدتك 24/7 في التجمع الخامس</p>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card text-center h-100" style="border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <div class="card-body p-4">
+                            <div class="mb-3" style="width: 70px; height: 70px; background: #25D366; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-whatsapp" style="font-size: 2rem; color: white;"></i>
+                            </div>
+                            <h5 style="color: #1a237e; font-weight: bold;">واتساب</h5>
+                            <p class="text-muted">رد فوري خلال دقايق</p>
+                            <a href="https://wa.me/201234567890" target="_blank" class="btn" style="background-color: #25D366; color: white; font-weight: bold;">
+                                كلمنا دلوقتي
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card text-center h-100" style="border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <div class="card-body p-4">
+                            <div class="mb-3" style="width: 70px; height: 70px; background: #1a237e; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-telephone-fill" style="font-size: 2rem; color: #FFD700;"></i>
+                            </div>
+                            <h5 style="color: #1a237e; font-weight: bold;">تليفون</h5>
+                            <p class="text-muted">01234567890</p>
+                            <a href="tel:01234567890" class="btn" style="background-color: #1a237e; color: white; font-weight: bold;">
+                                اتصل الآن
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card text-center h-100" style="border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <div class="card-body p-4">
+                            <div class="mb-3" style="width: 70px; height: 70px; background: #FFD700; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-envelope-fill" style="font-size: 2rem; color: #1a237e;"></i>
+                            </div>
+                            <h5 style="color: #1a237e; font-weight: bold;">إيميل</h5>
+                            <p class="text-muted">info@aqarstarhouse.com</p>
+                            <a href="mailto:info@aqarstarhouse.com" class="btn" style="background-color: #FFD700; color: #1a237e; font-weight: bold;">
+                                ابعت إيميل
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <div class="card-body p-5">
+                    <h3 style="color: #1a237e;" class="mb-4"><i class="bi bi-geo-alt-fill"></i> عنوانا</h3>
+                    <p class="mb-3"><strong>المقر الرئيسي:</strong> التجمع الخامس - شارع التسعين الجنوبي</p>
+                    <p class="mb-4"><strong>مواعيد العمل:</strong> السبت - الخميس | 9 صباحاً - 9 مساءً</p>
+                    
+                    <h3 style="color: #1a237e;" class="mb-4"><i class="bi bi-chat-dots-fill"></i> ابعتلنا رسالة</h3>
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control form-control-lg" placeholder="اسمك" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="tel" class="form-control form-control-lg" placeholder="رقم التليفون" required>
+                            </div>
+                            <div class="col-12">
+                                <input type="email" class="form-control form-control-lg" placeholder="الإيميل">
+                            </div>
+                            <div class="col-12">
+                                <textarea class="form-control form-control-lg" rows="4" placeholder="رسالتك..." required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-lg w-100" style="background-color: #1a237e; color: white; font-weight: bold;">
+                                    <i class="bi bi-send"></i> إرسال الرسالة
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <p class="text-muted text-center mt-3"><small>* الفورم ده شكل بس دلوقتي. اربطه بالباك إند بعدين</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -29,6 +29,15 @@ class Property(db.Model):  # ← شيلت _tablename_
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # ← غيرت 'users.id' لـ 'user.id'
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     images = db.relationship('PropertyImage', backref='property', lazy=True, cascade="all, delete-orphan")
+    bedrooms = db.Column(db.Integer, default=0)
+    bathrooms = db.Column(db.Integer, default=0)
+    area = db.Column(db.Integer, default=0)
+    finishing = db.Column(db.String(50)) # نص زي: سوبر لوكس، نص تشطيب
+    phone = db.Column(db.String(20)) # رقم المعلن
+    views = db.Column(db.Integer, default=0) # عدد المشاهدات
+    negotiable = db.Column(db.Boolean, default=False)
+    whatsapp = db.Column(db.String(20))
+
 
     def _repr_(self):
         return f"Property('{self.title}', '{self.price}')"

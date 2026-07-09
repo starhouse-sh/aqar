@@ -109,36 +109,49 @@ def logout():
 def create_property():
     form = PropertyForm()
     if form.validate_on_submit():
+        # لو رقم الواتس فاضي، خليه نفس رقم الموبايل
+        whatsapp_number = form.whatsapp.data if form.whatsapp.data else form.phone.data
+        
         property = Property(
             title=form.title.data,
             description=form.description.data,
             price=form.price.data,
+            negotiable=form.negotiable.data,
             location=form.location.data,
             type=form.type.data,
             property_type=form.property_type.data,
+            bedrooms=form.bedrooms.data,
+            bathrooms=form.bathrooms.data,
+            area=form.area.data,
+            finishing=form.finishing.data,
+            phone=form.phone.data,
+            whatsapp=whatsapp_number,
             user_id=current_user.id
         )
         db.session.add(property)
-        
-        if form.pictures.data:
-            for picture in form.pictures.data:
-                if picture and picture.filename != '':
-                    picture_file = save_picture(picture)
-                    image = PropertyImage(image_file=picture_file, property=property)
-                    db.session.add(image)
-        
         db.session.commit()
-        flash('تم اضافة العقار بنجاح', 'success')
-        return redirect(url_for('main.home'))
+        
+        # حفظ الصور...
+        if form.pictures.data:
+            for file in form.pictures.data:
+                if file:
+                    picture_file = save_picture(file)
+                    image = PropertyImage(image_file=picture_file, property_id=property.id)
+                    db.session.add(image)
+            db.session.commit()
+        
+        flash('تم إضافة العقار بنجاح!', 'success')
+        return redirect(url_for('main.property_detail', property_id=property.id))
     
-    if request.method == 'POST':
-        print("Form Errors:", form.errors)
-    
-    return render_template('create_property.html', title='عقار جديد', form=form, legend='اضافة عقار جديد')
-
+    return render_template('create_property.html', title='إضافة عقار', form=form, legend='إضافة عقار جديد')
 @main.route("/property/<int:property_id>")
 def property_detail(property_id):
     property = Property.query.get_or_404(property_id)
+    
+    # زود المشاهدات مع كل زيارة
+    property.views = (property.views or 0) + 1
+    db.session.commit()
+    
     return render_template('property.html', title=property.title, property=property)
 
 @main.route("/property/<int:property_id>/update", methods=['GET', 'POST'])
@@ -380,4 +393,16 @@ def admin_properties_partial():
         abort(403)
     pending = Property.query.filter_by(is_approved=False).order_by(Property.date_posted.desc()).all()
     return render_template('admin/admin_properties_partial.html', pending=pending)
+@main.route("/about")
+def about():
+    return render_template('about.html', title='من نحن')
+
+@main.route("/prices")
+def prices():
+    # هنا بعدين هنجيب الأسعار من الداتابيز
+    return render_template('prices.html', title='مؤشر الأسعار')
+
+@main.route("/contact")
+def contact():
+    return render_template('contact.html', title='تواصل معنا')
 
