@@ -3,7 +3,7 @@ from app import db
 from flask_login import UserMixin
 import re
 
-OWNER_EMAIL = "admin@admin.com"
+OWNER_EMAIL = "mmn108855@gmail.com"
 OWNER_PHONE = "01155712096"
 
 ALL_PERMISSIONS = {
