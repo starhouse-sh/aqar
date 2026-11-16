@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container-fluid mt-3"><h3>🚀 الليدز المتقدمة - فلترة وإحصائيات</h3>
+<div class="row"><div class="col-md-2"><div class="card p-2 text-center">إجمالي<br><b>{{total}}</b></div></div>
+<div class="col-md-2"><div class="card p-2 text-center">اتصال<br>{{by_type.phone + by_type.call}}</div></div>
+<div class="col-md-2"><div class="card p-2 text-center">واتساب<br>{{by_type.whatsapp}}</div></div>
+<div class="col-md-2"><div class="card p-2 text-center">حجز<br>{{by_type.visit_booking}}</div></div>
+<div class="col-md-4"><a href="{{url_for('main.export_leads')}}" class="btn btn-success">📥 تصدير Excel</a></div></div>
+<hr><form class="row g-2 mb-3"><div class="col"><input name="property_id" placeholder="ID عقار" class="form-control"></div><div class="col"><input name="office_id" placeholder="ID مكتب" class="form-control"></div><div class="col"><select name="contact_type" class="form-control"><option value="">الكل</option><option value="phone">phone</option><option value="whatsapp">whatsapp</option><option value="visit_booking">visit</option></select></div><div class="col"><input type="date" name="date_from" class="form-control"></div><div class="col"><button class="btn btn-primary">فلترة</button></div></form>
+<table class="table table-striped"><tr><th>ID</th><th>عقار</th><th>مكتب</th><th>نوع</th><th>تاريخ</th><th>IP</th></tr>
+{% for l in leads %}<tr><td>{{l.id}}</td><td>{{l.property_id}}</td><td>{{l.office_id}}</td><td><span class="badge bg-info">{{l.contact_type}}</span></td><td>{{l.created_at.strftime('%Y-%m-%d %H:%M') if l.created_at else ''}}</td><td>{{l.caller_ip if l.caller_ip is defined else l.caller_ip}}</td></tr>{% endfor %}
+</table>
+<h5>🏆 أكثر العقارات طلباً</h5><ul>{% for pid,c in top_props %}<li>عقار {{pid}} - {{c}} ليد</li>{% endfor %}</ul>
+</div>{% endblock %}

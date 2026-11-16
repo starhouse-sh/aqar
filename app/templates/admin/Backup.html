@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <h3>💾 النسخ الاحتياطي</h3>
+  <div class="card p-4 mb-4">
+    <form method="POST">
+      <p>اضغط لإنشاء نسخة احتياطية الآن من قاعدة البيانات</p>
+      <button class="btn btn-success btn-lg">📦 إنشاء نسخة الآن</button>
+    </form>
+  </div>
+  
+  {% if files %}
+  <h5>النسخ السابقة:</h5>
+  <ul class="list-group">
+    {% for f in files %}
+    <li class="list-group-item d-flex justify-content-between">{{ f }} <span class="badge bg-primary">موجود</span></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  
+  <div class="alert alert-info mt-4">
+    <b>تلقائي:</b> لعمل نسخ تلقائي كل يوم 3 الفجر، أضف هذا السطر في cron job أو Task Scheduler:<br>
+    <code>0 3 * * * python D:\aqar\backup_script.py</code>
+  </div>
+</div>
+{% endblock %}

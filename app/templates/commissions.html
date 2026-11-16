@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+<h3>💰 عمولاتي</h3>
+<div class="row mt-3">
+<div class="col-md-4"><div class="card text-center bg-light"><div class="card-body"><h5>إجمالي العمولة</h5><h3 class="text-success">{{ "{:,}".format(total or 0) }} ج</h3></div></div></div>
+<div class="col-md-4"><div class="card text-center bg-light"><div class="card-body"><h5>المدفوع</h5><h3 class="text-primary">{{ "{:,}".format(paid or 0) }} ج</h3></div></div></div>
+<div class="col-md-4"><div class="card text-center bg-light"><div class="card-body"><h5>المتبقي</h5><h3 class="text-warning">{{ "{:,}".format((total or 0)-(paid or 0)) }} ج</h3></div></div></div>
+</div>
+<table class="table table-bordered mt-4">
+<thead><tr><th>العقار</th><th>العمولة</th><th>التاريخ</th><th>الحالة</th></tr></thead>
+<tbody>
+{% for c in commissions %}
+<tr><td>{{ c.property.title if c.property else '-' }}</td><td>{{ c.commission_amount }} ج</td><td>{{ c.created_at.strftime('%Y-%m-%d') }}</td><td>{% if c.is_paid %}<span class="badge bg-success">مدفوعة</span>{% else %}<span class="badge bg-warning">غير مدفوعة</span>{% endif %}</td></tr>
+{% else %}
+<tr><td colspan="4" class="text-center">لا يوجد عمولات</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

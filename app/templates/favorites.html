@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: #1a237e; font-weight: 800;">
+            <i class="bi bi-heart-fill text-danger"></i> العقارات المفضلة
+        </h2>
+        <span class="badge" style="background-color: #1a237e; font-size: 1rem; padding: 10px 20px;">
+            {{ properties|length }} عقار
+        </span>
+    </div>
+    <hr>
+
+    {% if properties %}
+        <div class="row" id="favorites-container">
+            {% for property in properties %}
+                <div class="col-md-4 mb-4" id="property-{{ property.id }}">
+                    <div class="card h-100" style="border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden;">
+                        <!-- زرار الإزالة فوق الصورة -->
+                        <div style="position: relative;">
+                            {% if property.images %}
+                                <img src="{{ url_for('static', filename='property_pics/' + property.images[0].image_file) }}"
+                                     class="card-img-top"
+                                     style="height: 220px; object-fit: cover;">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='img/default-property.jpg') }}"
+                                     class="card-img-top"
+                                     style="height: 220px; object-fit: cover;">
+                            {% endif %}
+
+                            <!-- زرار الإزالة 👇 -->
+                            <button class="remove-fav-btn"
+                                    data-property-id="{{ property.id }}"
+                                    style="position: absolute; top: 10px; left: 10px; background-color: rgba(220, 53, 69, 0.9); border: none; border-radius: 50%; width: 40px; height: 40px; color: white; font-size: 1.2rem; cursor: pointer; transition: all 0.3s;"
+                                    title="إزالة من المفضلة">
+                                <i class="bi bi-heart-fill"></i>
+                            </button>
+                        </div>
+
+                        <div class="card-body p-3">
+                            <h5 class="card-title" style="color: #1a237e; font-weight: 700; font-size: 1.1rem;">
+                                {{ property.title }}
+                            </h5>
+                            <p class="card-text text-muted mb-2">
+                                <i class="bi bi-geo-alt-fill" style="color: #FFD700;"></i>
+                                {{ property.location }}
+                            </p>
+                            <h4 style="color: #1a237e; font-weight: 800; margin: 10px 0;">
+                                {{ "{:,.0f}".format(property.price) }} جنيه
+                            </h4>
+
+                            <!-- تفاصيل سريعة -->
+                            <div class="d-flex gap-3 text-muted small mb-3">
+                                <span><i class="bi bi-house-door"></i> {{ property.bedrooms or 0 }}</span>
+                                <span><i class="bi bi-droplet"></i> {{ property.bathrooms or 0 }}</span>
+                                <span><i class="bi bi-aspect-ratio"></i> {{ property.area or 0 }}م</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white" style="border: none; padding: 15px;">
+                            <a href="{{ url_for('main.property_detail', property_id=property.id) }}"
+                               class="btn w-100"
+                               style="background-color: #1a237e; color: white; font-weight: bold; border-radius: 10px;">
+                                <i class="bi bi-eye"></i> عرض التفاصيل
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-heartbreak" style="font-size: 5rem; color: #dc3545; opacity: 0.3;"></i>
+            <h4 class="mt-4" style="color: #1a237e; font-weight: 700;">لا توجد عقارات في المفضلة</h4>
+            <p class="text-muted mb-4">اضغط على علامة القلب ❤️ في أي عقار لإضافته هنا</p>
+            <a href="{{ url_for('main.home') }}" class="btn btn-lg" style="background-color: #1a237e; color: white; font-weight: bold; border-radius: 10px; padding: 12px 30px;">
+                <i class="bi bi-search"></i> تصفح العقارات
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- سكريبت الإزالة -->
+<script>
+// زرار الإزالة من المفضلة
+document.querySelectorAll('.remove-fav-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        let propertyId = this.dataset.propertyId;
+        let card = document.getElementById('property-' + propertyId);
+
+        if(confirm('هل تريد إزالة هذا العقار من المفضلة؟')) {
+            fetch('/favorite/' + propertyId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+           .then(res => res.json())
+           .then(data => {
+                if(data.status == 'removed') {
+                    // احذف الكارد بأنيميشن
+                    card.style.transition = 'all 0.3s';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        card.remove();
+
+                        // لو مفيش عقارات تانية، اعرض الرسالة
+                        if(document.querySelectorAll('#favorites-container.col-md-4').length == 0) {
+                            location.reload();
+                        }
+                    }, 300);
+                }
+            })
+           .catch(err => {
+                alert('حدث خطأ، جرب تاني');
+            });
+        }
+    });
+
+    // تأثير hover
+    btn.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.1)';
+        this.style.backgroundColor = '#c82333';
+    });
+    btn.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+        this.style.backgroundColor = 'rgba(220, 53, 69, 0.9)';
+    });
+});
+</script>
+{% endblock content %}

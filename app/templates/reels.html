@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <h3 class="mb-4">🎬 فيديوهات عقارية قصيرة - Reel</h3>
+  <div class="row">
+    {% for prop in properties %}
+    <div class="col-md-4 mb-4">
+      <div class="card shadow" style="border-radius:15px; overflow:hidden;">
+        <div style="background:#000; height:400px; display:flex; align-items:center; justify-content:center;">
+          {% if prop.video_url %}
+            {% if 'youtube' in prop.video_url or 'youtu.be' in prop.video_url %}
+              <iframe width="100%" height="100%" src="{{ prop.video_url | replace('watch?v=', 'embed/') }}" frameborder="0" allowfullscreen></iframe>
+            {% else %}
+              <video controls style="width:100%; height:100%; object-fit:cover;"><source src="{{ prop.video_url }}"></video>
+            {% endif %}
+          {% else %}
+            <p class="text-white">لا يوجد فيديو</p>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          <h6>{{ prop.title[:40] }}</h6>
+          <p class="text-success fw-bold">{{ prop.price }} جنيه</p>
+          <p class="text-muted small">{{ prop.location }}</p>
+          <a href="{{ url_for('main.property_detail', property_id=prop.id) }}" class="btn btn-primary btn-sm w-100">التفاصيل</a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <p class="text-center">لا يوجد فيديوهات حالياً - أضف فيديو لعقارك من صفحة العقار</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

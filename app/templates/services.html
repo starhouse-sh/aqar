@@ -1,0 +1,3 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4"><h3>🗺️ خدمات قريبة من {{prop.title}}</h3>
+<div class="row">{% for s in services %}<div class="col-md-3"><div class="card p-3 mb-3 text-center"><b>{{s.name}}</b><br>{{s.type}}<br><span class="badge bg-success">{{s.distance}}</span></div></div>{% endfor %}</div></div>{% endblock %}

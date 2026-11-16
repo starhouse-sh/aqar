@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3>📞 سجل المكالمات - مين اتصل بمين (الفكرة 6 - أهم فكرة)</h3>
+  <p class="text-muted">كل دوسة على "إظهار الرقم" أو "واتساب" بتتسجل هنا - ده اللي هيخلي المكتب يدفع بعد كده</p>
+
+  <div class="card p-3 mb-3">
+    <h4>إجمالي المكالمات: {{ total_leads }}</h4>
+  </div>
+
+  <table class="table table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>التاريخ</th>
+        <th>العقار</th>
+        <th>المكتب</th>
+        <th>النوع</th>
+        <th>IP</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for lead in leads %}
+      <tr>
+        <td><small>{{ lead.created_at.strftime('%Y-%m-%d %H:%M') }}</small></td>
+        <td><a href="{{ url_for('main.property_detail', property_id=lead.property_id) }}">{{ lead.property_obj.title[:30] }}</a></td>
+        <td>{{ lead.office.username }}</td>
+        <td>
+          {% if lead.contact_type == 'phone' %}<span class="badge bg-primary">📞 هاتف</span>
+          {% else %}<span class="badge bg-success">💬 واتساب</span>{% endif %}
+        </td>
+        <td><small>{{ lead.caller_ip }}</small></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

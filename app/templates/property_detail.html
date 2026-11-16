@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- العمود الرئيسي -->
+        <div class="col-lg-8">
+            <!-- الصور - Carousel -->
+            <div id="propertyCarousel" class="carousel slide mb-4" data-bs-ride="carousel" style="border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <div class="carousel-inner">
+                    {% if property.images and property.images|length > 0 %}
+                        {% for image in property.images %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <img src="{{ url_for('static', filename='property_pics/' + image.image_file) }}"
+                                 class="d-block w-100"
+                                 alt="{{ property.title }}"
+                                 style="height: 450px; object-fit: cover;">
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="carousel-item active">
+                            <img src="{{ url_for('static', filename='img/default-property.jpg') }}"
+                                 class="d-block w-100"
+                                 alt="{{ property.title }}"
+                                 style="height: 450px; object-fit: cover;">
+                        </div>
+                    {% endif %}
+                </div>
+                {% if property.images and property.images|length > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- 7. فيديو Reel لو موجود -->
+            {% if property.video_url %}
+            <div class="card mb-4" style="border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <div class="card-body p-3">
+                    <h5 class="mb-3">🎬 فيديو العقار - Reel</h5>
+                    {% if 'youtube.com' in property.video_url or 'youtu.be' in property.video_url %}
+                        <iframe width="100%" height="315" src="{{ property.video_url | replace('watch?v=', 'embed/') | replace('youtu.be/', 'www.youtube.com/embed/') }}" frameborder="0" allowfullscreen style="border-radius:10px;"></iframe>
+                    {% else %}
+                        <video controls style="width:100%; border-radius:10px; max-height:400px;"><source src="{{ property.video_url }}"></video>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- العنوان والسعر -->
+            <div class="card mb-4" style="border: none; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h1 style="color: #1a237e; font-weight: 800; font-size: 2rem; margin-bottom: 10px;">
+                                {{ property.title }}
+                                {% if property.is_featured_active %}
+                                <span class="badge" style="background:#FFD700; color:#1a237e; font-size:0.9rem; vertical-align:middle;">⭐ مميز</span>
+                                {% endif %}
+                                {% if property.negotiable %}
+                                <span class="badge bg-success" style="font-size:0.8rem; vertical-align:middle;">قابل للتفاوض</span>
+                                {% endif %}
+                                {% if property.is_sold is defined and property.is_sold %}
+                                <span class="badge bg-success" style="font-size:0.9rem; vertical-align:middle;">✅ تم البيع</span>
+                                {% endif %}
+                                {% if not property.is_approved %}
+                                <span class="badge bg-warning text-dark" style="font-size:0.8rem; vertical-align:middle;">⏳ قيد المراجعة</span>
+                                {% endif %}
+                            </h1>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-geo-alt-fill" style="color: #FFD700;"></i>
+                                {{ property.location }}
+                            </p>
+                            {% if property.expires_at %}
+                            <small class="text-muted"><i class="bi bi-clock"></i> ينتهي في: {{ property.expires_at.strftime('%Y-%m-%d') }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="text-end">
+                            <div style="color: #1a237e; font-size: 2rem; font-weight: 800;">
+                                {{ "{:,.0f}".format(property.price) }}
+                            </div>
+                            <small class="text-muted">جنيه مصري</small>
+                        </div>
+                    </div>
+
+                    <!-- زرار المفضلة والمقارنة -->
+                    <div class="mb-3 d-flex gap-2 flex-wrap">
+                        {% if current_user.is_authenticated %}
+                            <button id="fav-btn" data-property-id="{{ property.id }}" class="btn btn-lg" style="background-color: {% if is_favorite %}#dc3545{% else %}#fff{% endif %}; border: 2px solid #dc3545; color: {% if is_favorite %}#fff{% else %}#dc3545{% endif %}; font-weight: bold; border-radius: 10px; padding: 10px 25px; transition: all 0.3s;">
+                                {% if is_favorite %}
+                                    <i class="bi bi-heart-fill"></i> إزالة من المفضلة
+                                {% else %}
+                                    <i class="bi bi-heart"></i> أضف للمفضلة
+                                {% endif %}
+                            </button>
+                        {% else %}
+                            <a href="{{ url_for('main.login') }}" class="btn btn-lg" style="background-color: #fff; border: 2px solid #dc3545; color: #dc3545; font-weight: bold; border-radius: 10px; padding: 10px 25px;">
+                                <i class="bi bi-heart"></i> سجل دخول للإضافة للمفضلة
+                            </a>
+                        {% endif %}
+
+                        <!-- 3. المقارنة: للزوار والأفراد فقط - مش للمكاتب والوسطاء -->
+                        {% if not current_user.is_authenticated or current_user.account_type == 'individual' or current_user.account_type is none %}
+                        <button id="compare-btn" data-property-id="{{ property.id }}" class="btn btn-lg {% if in_compare %}btn-warning{% else %}btn-outline-dark{% endif %}" style="font-weight: bold; border-radius: 10px; padding: 10px 25px;">
+                            {% if in_compare %}
+                                <i class="bi bi-check2-square"></i> في المقارنة
+                            {% else %}
+                                <i class="bi bi-arrow-left-right"></i> أضف للمقارنة
+                            {% endif %}
+                        </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="badge" style="background-color: #1a237e; font-size: 0.9rem; padding: 8px 16px; margin-left: 8px;">
+                            {{ property.property_type }}
+                        </span>
+                        <span class="badge" style="background-color: #FFD700; color: #1a237e; font-size: 0.9rem; padding: 8px 16px;">
+                            {{ property.type }}
+                        </span>
+                    </div>
+
+                    <hr style="margin: 20px 0;">
+
+                    <h5 style="color: #1a237e; font-weight: 700; margin-bottom: 20px;">
+                        <i class="bi bi-info-circle-fill"></i> تفاصيل العقار
+                    </h5>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3" style="background-color: #f8f9fa; border-radius: 10px;">
+                                <i class="bi bi-house-door" style="font-size: 2rem; color: #1a237e;"></i>
+                                <div style="font-weight: 700; font-size: 1.3rem; margin-top: 8px; color: #1a237e;">
+                                    {{ property.bedrooms or property.rooms or 0 }}
+                                </div>
+                                <small class="text-muted">غرف نوم</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3" style="background-color: #f8f9fa; border-radius: 10px;">
+                                <i class="bi bi-droplet" style="font-size: 2rem; color: #1a237e;"></i>
+                                <div style="font-weight: 700; font-size: 1.3rem; margin-top: 8px; color: #1a237e;">
+                                    {{ property.bedrooms or property.baths or 0 }}
+                                </div>
+                                <small class="text-muted">حمامات</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3" style="background-color: #f8f9fa; border-radius: 10px;">
+                                <i class="bi bi-aspect-ratio" style="font-size: 2rem; color: #1a237e;"></i>
+                                <div style="font-weight: 700; font-size: 1.3rem; margin-top: 8px; color: #1a237e;">
+                                    {{ property.area or 0 }}
+                                </div>
+                                <small class="text-muted">متر مربع</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3" style="background-color: #f8f9fa; border-radius: 10px;">
+                                <i class="bi bi-paint-bucket" style="font-size: 2rem; color: #1a237e;"></i>
+                                <div style="font-weight: 600; font-size: 1rem; margin-top: 8px; color: #1a237e;">
+                                    {{ property.finishing or 'غير محدد' }}
+                                </div>
+                                <small class="text-muted">التشطيب</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr style="margin: 20px 0;">
+
+                    <h5 style="color: #1a237e; font-weight: 700; margin-bottom: 15px;">
+                        <i class="bi bi-card-text"></i> الوصف
+                    </h5>
+                    <p style="line-height: 1.8; color: #495057; font-size: 1.05rem;">
+                        {{ property.description or 'لا يوجد وصف متاح' }}
+                    </p>
+
+                    {% set owner_check = property.author if property.author is defined and property.author else (property.user if property.user is defined else None) %}
+                    {% if current_user.is_authenticated and owner_check and current_user.id == owner_check.id %}
+                    <hr style="margin: 20px 0;">
+                    <h6 style="color:#1a237e; font-weight:700;">⚙️ إدارة العقار (مالك العقار فقط)</h6>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <!-- 2. تعديل - يرجع للمراجعة لو عميل عادي -->
+                        <a href="{{ url_for('main.edit_property', property_id=property.id) }}" class="btn" style="background-color: #1a237e; color: white; font-weight: bold;">
+                            <i class="bi bi-pencil"></i> تعديل (مراجعة للعميل)
+                        </a>
+                        <form action="{{ url_for('main.delete_property', property_id=property.id) }}" method="POST" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger" style="font-weight: bold;" onclick="return confirm('هل أنت متأكد من حذف العقار؟')">
+                                <i class="bi bi-trash"></i> حذف
+                            </button>
+                        </form>
+                        <!-- 6. تم البيع -->
+                        {% if property.is_sold is defined and not property.is_sold %}
+                        <form method="POST" action="{{ url_for('main.mark_sold', property_id=property.id) }}" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-success" onclick="return confirm('متأكد تم البيع؟ سيختفي من الرئيسية')" style="font-weight:bold;"><i class="bi bi-check-circle"></i> ✅ تم البيع</button>
+                        </form>
+                        {% elif property.is_sold is defined and property.is_sold %}
+                        <form method="POST" action="{{ url_for('main.mark_available', property_id=property.id) }}" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-secondary" style="font-weight:bold;">↩️ إرجاع متاح</button>
+                        </form>
+                        {% endif %}
+                        <!-- 8. سجل التعديلات -->
+                        <a href="{{ url_for('main.property_history', property_id=property.id) }}" class="btn btn-outline-dark" style="font-weight:bold;"><i class="bi bi-clock-history"></i> 📜 سجل التعديلات</a>
+                    </div>
+                    <!-- 7. إضافة Reel -->
+                    <div class="card mt-3 p-3" style="background:#f8f9fa; border-radius:10px;">
+                        <label class="fw-bold small mb-2">🎬 إضافة/تعديل فيديو Reel للعقار (يوتيوب / رابط مباشر):</label>
+                        <form method="POST" action="{{ url_for('main.upload_reel', property_id=property.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="input-group">
+                                <input type="text" name="reel_url" class="form-control" placeholder="https://youtube.com/watch?v=... أو https://...mp4" value="{{ property.video_url or '' }}">
+                                <button class="btn btn-dark">💾 حفظ الفيديو</button>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card" style="border: none; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div class="card-body p-4">
+                    <h5 style="color: #1a237e; font-weight: 700; margin-bottom: 15px;">
+                        <i class="bi bi-map-fill"></i> الموقع على الخريطة
+                    </h5>
+                    <div style="border-radius: 10px; overflow: hidden;">
+                        {% if property.latitude and property.longitude %}
+                        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                        <div id="propMap" style="height:350px;"></div>
+                        {% else %}
+                        <iframe width="100%" height="350" frameborder="0" style="border:0" src="https://www.google.com/maps?q={{ property.location|urlencode }}&output=embed" allowfullscreen></iframe>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- العمود الجانبي -->
+        <div class="col-lg-4">
+            {% set owner = property.author if property.author is defined and property.author else (property.user if property.user is defined else None) %}
+            <div class="card sticky-top" style="top: 20px; border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <div class="card-body p-4">
+                    <h5 style="color: #1a237e; font-weight: 700; margin-bottom: 20px;">
+                        <i class="bi bi-person-circle"></i> معلومات المعلن
+                    </h5>
+                    {% if owner %}
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #1a237e, #3949ab); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: bold;">
+                            {{ owner.username[0].upper() }}
+                        </div>
+                        <div style="margin-right: 15px;">
+                            <div style="font-weight: 700; font-size: 1.1rem; color: #1a237e;">
+                                {{ owner.company_name or owner.username }}
+                            </div>
+                            {% if owner.account_type in ['office','broker'] %}
+                            <small class="badge bg-warning text-dark">{{ 'مكتب' if owner.account_type == 'office' else 'وسيط' }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <hr>
+                    {% endif %}
+                    <div id="phoneCard">
+                        {% set phone = property.phone or (owner.phone if owner and owner.phone is defined and owner.phone else None) %}
+                        {% if phone %}
+                        <div id="phoneHidden">
+                            <div class="d-grid gap-2">
+                                <button id="showPhoneBtn" class="btn btn-lg" style="background-color: #1a237e; color: white; font-weight: bold; border-radius: 10px;" onclick="revealPhone({{ property.id }})">
+                                    <i class="bi bi-eye-fill"></i> إظهار رقم التليفون
+                                </button>
+                                <small class="text-muted text-center">سيظهر زرارين: اتصال + واتساب</small>
+                            </div>
+                        </div>
+                        <div id="phoneVisible" style="display:none;">
+                            <div class="d-grid gap-2">
+                                <a id="phoneNumberLink" href="#" class="btn btn-lg" style="background-color: #1a237e; color: white; font-weight: bold; border-radius: 10px;">
+                                    <i class="bi bi-telephone-fill"></i> <span id="phoneNumberText"></span> - اتصال مباشر
+                                </a>
+                                <a id="whatsappLink" href="#" target="_blank" class="btn btn-lg" style="background-color: #25D366; color: white; font-weight: bold; border-radius: 10px;">
+                                    <i class="bi bi-whatsapp"></i> واتساب مباشر
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning text-center mb-0">
+                            <i class="bi bi-exclamation-triangle"></i> رقم الهاتف غير متاح
+                        </div>
+                        {% endif %}
+                    </div>
+                    <hr style="margin: 20px 0;">
+                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 10px;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span style="color: #6c757d;"><i class="bi bi-calendar-event" style="color: #1a237e;"></i> تاريخ النشر</span>
+                            <strong style="color: #1a237e;">{{ (property.date_posted or property.created_at).strftime('%Y-%m-%d') if (property.date_posted or property.created_at) else 'اليوم' }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span style="color: #6c757d;"><i class="bi bi-eye-fill" style="color: #FFD700;"></i> المشاهدات</span>
+                            <strong style="color: #1a237e; font-size: 1.2rem;">{{ property.views or 0 }}</strong>
+                        </div>
+                        {% if property.expires_at %}
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span style="color: #6c757d;"><i class="bi bi-hourglass-split"></i> ينتهي</span>
+                            <strong style="color: #dc3545;">{{ property.expires_at.strftime('%Y-%m-%d') }}</strong>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <!-- 4. تقدير سعر + 9. بحث متقدم -->
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{{ url_for('main.estimate_price') }}" class="btn btn-outline-primary btn-sm">💰 تقدير سعر عقارك</a>
+                        <a href="{{ url_for('main.advanced_search') }}" class="btn btn-outline-dark btn-sm">🔍 بحث متقدم (يفهم شقه=شقة)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.getElementById('fav-btn')?.addEventListener('click', function() {
+    let btn = this;
+    fetch('/favorite/' + btn.dataset.propertyId, { method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token() }}'} })
+   .then(res => res.json())
+   .then(data => {
+        if(data.status == 'added') {
+            btn.innerHTML = '<i class="bi bi-heart-fill"></i> إزالة من المفضلة';
+            btn.style.backgroundColor = '#dc3545';
+            btn.style.color = '#fff';
+        } else if(data.status == 'removed') {
+            btn.innerHTML = '<i class="bi bi-heart"></i> أضف للمفضلة';
+            btn.style.backgroundColor = '#fff';
+            btn.style.color = '#dc3545';
+        }
+    })
+   .catch(err => { console.log('Error:', err); alert('حدث خطأ، تأكد من تسجيل الدخول'); });
+});
+document.getElementById('compare-btn')?.addEventListener('click', function() {
+    let btn = this;
+    let propId = btn.dataset.propertyId;
+    fetch('/compare/add/' + propId, { method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token() }}'} })
+   .then(res => res.json())
+   .then(data => {
+        if(data.status == 'added') {
+            btn.innerHTML = '<i class="bi bi-check2-square"></i> في المقارنة';
+            btn.classList.remove('btn-outline-dark'); btn.classList.add('btn-warning');
+            let badge = document.getElementById('compareCountBadge'); if(badge) badge.textContent = data.count;
+            alert('✅ تمت الإضافة للمقارنة - ' + data.count + '/4');
+        } else if(data.status == 'exists') { alert('موجود بالفعل في المقارنة'); }
+        else if(data.status == 'full') { alert('⚠ تقدر تقارن 4 عقارات كحد أقصى'); window.location.href = '/compare'; }
+    })
+   .catch(err => { console.log('Error:', err); alert('حدث خطأ'); });
+});
+function revealPhone(propertyId) {
+    fetch(`/property/${propertyId}/reveal-phone`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' } })
+    .then(res => res.json()).then(data => {
+        if(data.status === 'success') {
+            document.getElementById('phoneHidden').style.display = 'none';
+            document.getElementById('phoneVisible').style.display = 'block';
+            document.getElementById('phoneNumberText').textContent = data.phone;
+            document.getElementById('phoneNumberLink').href = `tel:${data.phone}`;
+            document.getElementById('whatsappLink').href = data.whatsapp_link || `https://wa.me/${data.whatsapp}`;
+        } else { alert('حدث خطأ، حاول مرة أخرى'); }
+    }).catch(() => alert('خطأ في الاتصال'));
+}
+{% if property.latitude and property.longitude %}
+var propMap = L.map('propMap').setView([{{ property.latitude }}, {{ property.longitude }}], 15);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(propMap);
+L.marker([{{ property.latitude }}, {{ property.longitude }}]).addTo(propMap).bindPopup("{{ property.location }}").openPopup();
+{% endif %}
+</script>
+{% endblock content %}

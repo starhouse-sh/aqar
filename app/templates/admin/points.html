@@ -1,0 +1,3 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4"><h3>⭐ نقاط المكاتب</h3><table class="table"><tr><th>مكتب</th><th>عقارات</th><th>ليدز</th><th>نقاط</th></tr>
+{% for d in data %}<tr><td>{{d.user.username}}</td><td>{{d.props}}</td><td>{{d.leads}}</td><td><b>{{d.points}}</b></td></tr>{% endfor %}</table></div>{% endblock %}

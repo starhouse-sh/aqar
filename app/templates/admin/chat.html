@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .chat-container { height: 80vh; border: 1px solid #dee2e6; border-radius: 10px; overflow: hidden; background: white; }
+    .chat-sidebar { border-left: 1px solid #dee2e6; background-color: #f8f9fa; overflow-y: auto; }
+    .chat-messages { background-color: #e5ddd5; overflow-y: auto; }
+    .message-bubble { max-width: 65%; padding: 10px 15px; border-radius: 18px; margin-bottom: 10px; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); }
+    .message-me { background-color: #dcf8c6; margin-left: auto; }
+    .message-other { background-color: white; }
+    .chat-img { max-width: 250px; border-radius: 10px; cursor: pointer; }
+    .chat-video { max-width: 250px; border-radius: 10px; }
+</style>
+
+<div class="container-fluid mt-3">
+    <div class="row chat-container">
+        <div class="col-4 col-md-3 p-0 chat-sidebar d-flex flex-column">
+            <div class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">💬 محادثات</h6>
+                <a href="{{ url_for('main.manage_admins') }}" class="btn btn-sm btn-outline-light">إدارة</a>
+            </div>
+            <div class="list-group list-group-flush flex-grow-1">
+                {% for u in chat_users %}
+                <a href="{{ url_for('main.chat_with_user', user_id=u.id) }}" class="list-group-item list-group-item-action {% if selected_user and selected_user.id == u.id %}active{% endif %}">
+                    <strong>{{ u.username }}</strong><br>
+                    <small style="font-size: 11px;">{{ u.email }}</small>
+                    {% if unread_counts[u.id] > 0 %}<span class="badge bg-danger">{{ unread_counts[u.id] }}</span>{% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-8 col-md-9 p-0 d-flex flex-column">
+            {% if selected_user %}
+            <div class="p-3 bg-white border-bottom">
+                <h6 class="mb-0">تتحدث مع: {{ selected_user.username }}</h6>
+            </div>
+
+            <div id="messagesBox" class="flex-grow-1 p-3 chat-messages d-flex flex-column">
+                {% for msg in messages %}
+                <div class="d-flex {% if msg.sender_id == current_user.id %}justify-content-end{% else %}justify-content-start{% endif %}">
+                    <div class="message-bubble {% if msg.sender_id == current_user.id %}message-me{% else %}message-other{% endif %}">
+                        {% if msg.content %}<div>{{ msg.content }}</div>{% endif %}
+                        {% if msg.file_path %}
+                            {% if msg.file_type == 'image' %}
+                                <img src="{{ url_for('static', filename=msg.file_path) }}" class="chat-img mt-2">
+                            {% elif msg.file_type == 'video' %}
+                                <video controls class="chat-video mt-2"><source src="{{ url_for('static', filename=msg.file_path) }}"></video>
+                            {% endif %}
+                        {% endif %}
+                        <div class="text-end"><small style="font-size: 10px;">{{ msg.timestamp.strftime('%I:%M %p') }}</small></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="p-3 bg-white border-top">
+                <form id="chatForm" class="d-flex gap-2 align-items-center" enctype="multipart/form-data">
+                    <input type="hidden" id="receiver_id" value="{{ selected_user.id }}">
+                    <label for="fileInput" class="btn btn-outline-secondary rounded-circle" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;">📎</label>
+                    <input type="file" id="fileInput" name="file" accept="image/*,video/*" style="display:none;">
+                    <span id="fileName" class="small text-muted"></span>
+                    <input type="text" id="messageContent" class="form-control rounded-pill" placeholder="اكتب رسالتك هنا..." autocomplete="off">
+                    <button type="submit" class="btn btn-success rounded-pill px-4">إرسال</button>
+                </form>
+            </div>
+            {% else %}
+            <div class="d-flex h-100 justify-content-center align-items-center">اختر مشرف لبدء المحادثة</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if selected_user %}
+<script>
+const messagesBox = document.getElementById('messagesBox');
+messagesBox.scrollTop = messagesBox.scrollHeight;
+document.getElementById('fileInput').addEventListener('change', function(){ document.getElementById('fileName').textContent = this.files[0] ? this.files[0].name : ''; });
+
+function appendMessage(m){
+    let fileHtml = '';
+    if(m.file_path || m.file_url){
+        if(m.file_type === 'image') fileHtml = `<img src="${m.file_url || '/static/'+m.file_path}" class="chat-img mt-2">`;
+        else if(m.file_type === 'video') fileHtml = `<video controls class="chat-video mt-2"><source src="${m.file_url || '/static/'+m.file_path}"></video>`;
+    }
+    const div = document.createElement('div');
+    div.className = `d-flex ${m.is_me ? 'justify-content-end' : 'justify-content-start'}`;
+    div.innerHTML = `<div class="message-bubble ${m.is_me ? 'message-me' : 'message-other'}"><div>${m.content || ''}</div>${fileHtml}<div class="text-end"><small style="font-size: 10px;">${m.timestamp}</small></div></div>`;
+    messagesBox.appendChild(div);
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+}
+
+document.getElementById('chatForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const receiver_id = document.getElementById('receiver_id').value;
+    const content = document.getElementById('messageContent').value.trim();
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    if(!content && !file) return;
+
+    const formData = new FormData();
+    formData.append('receiver_id', receiver_id);
+    formData.append('content', content);
+    if(file) formData.append('file', file);
+    formData.append('csrf_token', '{{ csrf_token() }}');
+
+    // فضي الخانة فوراً
+    document.getElementById('messageContent').value = '';
+    document.getElementById('fileName').textContent = '';
+    fileInput.value = '';
+
+    fetch("{{ url_for('main.send_chat_message') }}", { method: "POST", body: formData })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === 'success'){
+            appendMessage(data.message); // اعرضها بدون ما تعمل reload
+        }
+    });
+});
+
+// تحديث الرسائل كل 7 ثواني بدل 3 عشان يريح السيرفر
+let chatInterval = setInterval(function(){
+    const receiver_id = document.getElementById('receiver_id').value;
+    if(!receiver_id) return;
+    fetch(`/admin/chat/api/messages/${receiver_id}`)
+    .then(res => res.json())
+    .then(messages => {
+        // هنحدث فقط لو فيه رسائل جديدة
+        if(messages.length > messagesBox.children.length){
+            messagesBox.innerHTML = '';
+            messages.forEach(m => {
+                let fileHtml = '';
+                if(m.file_path){
+                    if(m.file_type === 'image') fileHtml = `<img src="${m.file_url}" class="chat-img mt-2">`;
+                    else if(m.file_type === 'video') fileHtml = `<video controls class="chat-video mt-2"><source src="${m.file_url}"></video>`;
+                }
+                const div = document.createElement('div');
+                div.className = `d-flex ${m.is_me ? 'justify-content-end' : 'justify-content-start'}`;
+                div.innerHTML = `<div class="message-bubble ${m.is_me ? 'message-me' : 'message-other'}"><div>${m.content || ''}</div>${fileHtml}<div class="text-end"><small style="font-size: 10px;">${m.timestamp}</small></div></div>`;
+                messagesBox.appendChild(div);
+            });
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
+    });
+}, 7000);
+
+// وقف التحديث لما المستخدم يخرج من الصفحة
+document.addEventListener('visibilitychange', () => {
+    if(document.hidden) clearInterval(chatInterval);
+});
+</script>
+{% endif %}
+{% endblock %}

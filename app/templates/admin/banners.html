@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<title>البنرات - Admin</title>
+</head>
+<body>
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+<h3>🎯 إدارة البنرات الإعلانية</h3>
+<p class="text-muted">بيع مساحات إعلانية للمكاتب / روج لباقاتك / إعلانات خارجية</p>
+
+<button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addBanner">+ إضافة بنر جديد</button>
+
+<table class="table table-bordered text-center">
+<tr><th>صورة</th><th>عنوان</th><th>مكان</th><th>مشاهدات/نقرات</th><th>نشط</th><th>تحكم</th></tr>
+{% for b in banners %}
+<tr>
+<td><img src="{{ b.image_url }}" style="height:40px;border-radius:6px"></td>
+<td>{{ b.title }}</td>
+<td><span class="badge bg-info">{{ b.position }}</span></td>
+<td>{{ b.views|default(0) }} / {{ b.clicks|default(0) }}</td>
+<td>{% if b.is_active %}✅{% else %}❌{% endif %}</td>
+<td>
+<a href="/admin/banners/{{ b.id }}/toggle" class="btn btn-sm btn-warning">تفعيل/إيقاف</a>
+<a href="/admin/banners/{{ b.id }}/delete" class="btn btn-sm btn-danger">حذف</a>
+</td>
+</tr>
+{% endfor %}
+</table>
+
+<!-- Modal إضافة -->
+<div class="modal fade" id="addBanner" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<form method="POST" action="/admin/banners/add">
+<div class="modal-header"><h5>إضافة بنر جديد</h5></div>
+<div class="modal-body">
+<label>عنوان البنر</label>
+<input name="title" class="form-control mb-2" placeholder="مثال: خصم 50% على الباقة الذهبية" required>
+<label>رابط الصورة (Imgur / رابط مباشر)</label>
+<input name="image_url" class="form-control mb-2" placeholder="https://..." required>
+<label>رابط عند الضغط</label>
+<input name="link_url" class="form-control mb-2" placeholder="/packages" required>
+<label>مكان الظهور</label>
+<select name="position" class="form-select mb-2">
+<option value="home_top">فوق الرئيسية - home_top (أهم واحد - 1200x200)</option>
+<option value="home_middle">وسط الرئيسية - home_middle</option>
+<option value="sidebar">الشريط الجانبي - sidebar (300x250)</option>
+<option value="search_top">فوق صفحة البحث - search_top</option>
+</select>
+<label>من تاريخ</label><input type="date" name="start_date" class="form-control mb-2">
+<label>إلى تاريخ</label><input type="date" name="end_date" class="form-control mb-2">
+<div class="form-check"><input type="checkbox" name="is_active" checked class="form-check-input"><label>نشط الآن</label></div>
+</div>
+<div class="modal-footer"><button type="submit" class="btn btn-primary">حفظ البنر</button></div>
+</form>
+</div></div></div>
+
+<div class="alert alert-info mt-4">
+<b>مقاسات مقترحة:</b><br>
+- home_top: 1200x200 أو 1200x150 (بنر عريض)<br>
+- sidebar: 300x250 (مربع)<br>
+- search_top: 800x100<br>
+تقدر تعمل صورة مجانية من canva.com
+</div>
+
+</div>
+{% endblock %}
+</body>
+</html>

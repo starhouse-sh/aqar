@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4" style="max-width:700px;">
+  <h3>➕ أضف عقار مطلوب - خلي المكاتب تكلمك</h3>
+  <p class="text-muted">مثال: مطلوب شقة 150م في التجمع ب 2 مليون - المكاتب هتكلمك</p>
+
+  <form method="POST" class="card p-4 shadow">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="mb-3">
+      <label>عنوان الطلب (مهم للسيو)</label>
+      <input type="text" name="title" class="form-control" placeholder="مثال: مطلوب شقة 200م في مدينتي للبيع" required minlength="10">
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label>المكان</label>
+        <input type="text" name="location" class="form-control" placeholder="التجمع الخامس">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label>الميزانية</label>
+        <input type="number" name="budget" class="form-control" placeholder="3000000">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label>نوع الطلب</label>
+        <select name="request_type" class="form-select">
+          <option value="buy">شراء</option>
+          <option value="rent">إيجار</option>
+        </select>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label>نوع العقار</label>
+        <select name="property_type" class="form-select">
+          <option value="">أي نوع</option>
+          <option value="شقة">شقة</option>
+          <option value="فيلا">فيلا</option>
+          <option value="أرض">أرض</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label>التفاصيل</label>
+      <textarea name="description" class="form-control" rows="3" placeholder="اكتب تفاصيل أكتر..."></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label>رقم التواصل</label>
+      <input type="text" name="phone" class="form-control" placeholder="010xxxxxxxx" value="{{ current_user.phone }}">
+    </div>
+
+    <button class="btn btn-primary w-100 btn-lg">نشر الطلب</button>
+  </form>
+</div>
+{% endblock %}

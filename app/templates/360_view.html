@@ -1,0 +1,3 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4 text-center"><h3>🏠 جولة 360° - {{prop.title}}</h3><p>هنا هتتحط صورة 360 لاحقاً</p><div style="background:#111;color:#fff;padding:100px">360 View Placeholder - {{prop.title}}</div>
+<a href="{{url_for('main.property_detail', id=prop.id)}}" class="btn btn-primary mt-3">رجوع</a></div>{% endblock %}

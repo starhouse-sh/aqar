@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow"><div class="card-body text-center">
+                <h3>{{ office.company_name or office.username }}</h3>
+                {% if office.is_verified %}<span class="badge bg-success">موثق ✓</span>{% endif %}
+                <p class="mt-2">{{ office.office_address }}</p><p>{{ office.bio }}</p><hr>
+                <h4>⭐ {{ office.rating_avg or 0 }} ({{ office.rating_count or 0 }})</h4><hr>
+                {% if current_user.is_authenticated and current_user.id != office.id %}
+                <form id="rateForm"><select name="stars" class="form-select mb-2"><option value="5">⭐⭐⭐⭐⭐ ممتاز</option><option value="4">⭐⭐⭐⭐</option><option value="3">⭐⭐⭐</option><option value="2">⭐⭐</option><option value="1">⭐</option></select><textarea name="comment" class="form-control mb-2" placeholder="تعليقك"></textarea><button type="submit" class="btn btn-warning w-100">إرسال التقييم</button></form><div id="rateMsg" class="mt-2"></div>{% endif %}
+            </div></div>
+            <div class="card mt-3"><div class="card-header">آخر التقييمات</div><div class="card-body">{% for r in ratings %}<div class="border-bottom pb-2 mb-2"><strong>{{ r.rater.username }}</strong> - {% for i in range(r.stars) %}⭐{% endfor %}<br><small>{{ r.comment }}</small><br><small class="text-muted">{{ r.created_at.strftime('%Y-%m-%d') }}</small></div>{% else %}<small>لا يوجد تقييمات</small>{% endfor %}</div></div>
+        </div>
+        <div class="col-md-8"><h4>عقارات المكتب ({{ properties|length }})</h4><div class="row">{% for prop in properties %}<div class="col-md-6 mb-3"><div class="card h-100">{% if prop.images %}<img src="{{ url_for('static', filename='property_pics/' + prop.images[0].image_file) }}" class="card-img-top" style="height:200px;object-fit:cover">{% endif %}<div class="card-body"><h6>{{ prop.title }}</h6><p class="text-success fw-bold">{{ "{:,}".format(prop.price) }} جنيه</p><a href="{{ url_for('main.property_detail', property_id=prop.id) }}" class="btn btn-sm btn-primary">تفاصيل</a></div></div></div>{% endfor %}</div></div>
+    </div>
+</div>
+<script>
+document.getElementById('rateForm')?.addEventListener('submit', function(e){e.preventDefault();let fd=new FormData(this);fetch("{{ url_for('main.rate_office', office_id=office.id) }}",{method:'POST',body:fd,headers:{'X-CSRFToken':'{{ csrf_token() }}'}}).then(r=>r.json()).then(d=>{document.getElementById('rateMsg').innerHTML='<div class="alert alert-'+(d.status=='success'?'success':'danger')+'">'+d.message+'</div>';if(d.status=='success')setTimeout(()=>location.reload(),1000);});});
+</script>
+{% endblock %}

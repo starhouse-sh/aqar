@@ -1,0 +1,26 @@
+{
+  "name": "Star House - ستار هاوس",
+  "short_name": "Star House",
+  "description": "اعثر على منزل أحلامك في القاهرة الجديدة",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#1a237e",
+  "theme_color": "#1a237e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

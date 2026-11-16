@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5 text-center">
+  <h1 style="font-size:80px;">404</h1>
+  <h3>العقار مش موجود 😕</h3>
+  <p class="text-muted">الرابط اللي بتدور عليه اتحذف أو مش موجود</p>
+  <a href="/" class="btn btn-primary btn-lg mb-5">العودة للرئيسية</a>
+  
+  {% if suggested %}
+  <hr>
+  <h5 class="mb-4">شوف دول بدلاً منه:</h5>
+  <div class="row">
+    {% for prop in suggested %}
+    <div class="col-md-4 mb-3">
+      <div class="card">
+        {% if prop.images %}<img src="{{ url_for('static', filename='property_pics/' + prop.images[0].image_file) }}" class="card-img-top" style="height:180px; object-fit:cover;">{% endif %}
+        <div class="card-body">
+          <h6>{{ prop.title }}</h6>
+          <p class="text-success fw-bold">{{ prop.price }} جنيه</p>
+          <a href="{{ url_for('main.property_detail', property_id=prop.id) }}" class="btn btn-sm btn-outline-primary">شوف التفاصيل</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

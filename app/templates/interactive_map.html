@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid mt-2">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card p-3 shadow-sm sticky-top" style="top:10px">
+        <h5>🗺️ خريطة التجمع الخامس - Star House</h5>
+        <p class="small text-muted">مركز شغلك: القاهرة الجديدة والتجمع الخامس فقط</p>
+        <p class="small">إجمالي العقارات على الخريطة: <b>{{ properties|length }}</b></p>
+        <button id="circleMode" class="btn btn-warning btn-sm w-100 mb-2">📍 ارسم دائرة للبحث في التجمع</button>
+        <button id="clearCircle" class="btn btn-outline-secondary btn-sm w-100 mb-2 d-none">❌ مسح الدائرة وإظهار الكل</button>
+        <div class="mb-2">
+          <label class="form-label small">نصف القطر (كم) - <span id="radiusVal" class="badge bg-dark">1 كم</span></label>
+          <input id="radiusInput" type="range" min="0.5" max="5" step="0.5" value="1" class="form-range">
+        </div>
+        <div id="circleResults" class="small bg-light p-2 rounded border" style="min-height:100px;max-height:50vh;overflow-y:auto">
+          <div class="text-muted">1- دوس على الزرار الأصفر<br>2- دوس على أي حتة في الخريطة<br>3- هيظهر هنا قائمة العقارات جوه الدائرة</div>
+        </div>
+        <hr>
+        <h6 class="small fw-bold">أحياء التجمع:</h6>
+        <div class="d-grid gap-1">
+          <button class="btn btn-outline-dark btn-sm area-btn" data-lat="30.0144" data-lng="31.4771">التجمع الخامس - العام</button>
+          <button class="btn btn-outline-dark btn-sm area-btn" data-lat="30.0150" data-lng="31.4435">التسعين الشمالي</button>
+          <button class="btn btn-outline-dark btn-sm area-btn" data-lat="30.0033" data-lng="31.4748">التسعين الجنوبي</button>
+          <button class="btn btn-outline-dark btn-sm area-btn" data-lat="30.0295" data-lng="31.4912">اللوتس</button>
+          <button class="btn btn-outline-dark btn-sm area-btn" data-lat="30.0250" data-lng="31.4650">الياسمين</button>
+          <button class="btn btn-outline-dark btn-sm area-btn" data-lat="30.0220" data-lng="31.4620">النرجس</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div id="map" style="height:70vh;border-radius:12px;border:2px solid #111"></div>
+      <div id="listBelowMap" class="row mt-3 g-2"></div>
+    </div>
+  </div>
+</div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const props = [
+  {% for p in properties %}{id:{{p.id}}, title:`{{p.title|replace('`','')|replace('\n',' ')|replace('\r',' ')}}}`, price:{{p.price}}, lat:{{p.latitude or 0}}, lng:{{p.longitude or 0}}, location:`{{p.location|replace('`','')}}`, url:`{{ url_for('main.property_detail', property_id=p.id) }}`, area:{{p.area or 0}}},{% endfor %}
+];
+
+const map = L.map('map').setView([30.0144, 31.4771], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19}).addTo(map);
+
+let markers = L.layerGroup().addTo(map);
+
+function haversine(lat1, lon1, lat2, lon2){
+  const R=6371;
+  const dLat=(lat2-lat1)*Math.PI/180;
+  const dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function renderMarkers(list){
+  markers.clearLayers();
+  list.forEach(p=>{
+    if(!p.lat || !p.lng || p.lat==0) return;
+    L.marker([p.lat,p.lng]).addTo(markers).bindPopup(`<b>${p.title}</b><br>${p.location}<br>${p.price.toLocaleString()} جنيه - ${p.area}m<br><a href="${p.url}" class="btn btn-sm btn-warning mt-1">تفاصيل</a>`);
+  });
+  renderBelow(list);
+}
+
+function renderBelow(list){
+  const container=document.getElementById('listBelowMap');
+  if(!list.length){
+    container.innerHTML='<div class="col-12"><div class="alert alert-warning small">مفيش عقارات في النطاق ده، كبر الدائرة شوية</div></div>';
+    return;
+  }
+  container.innerHTML=list.map(p=>`
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body p-2">
+          <h6 class="small fw-bold mb-1">${p.title.substring(0,45)}</h6>
+          <div class="small text-muted">${p.location.substring(0,30)}</div>
+          <div class="d-flex justify-content-between mt-1">
+            <span class="badge bg-dark">${p.price.toLocaleString()} جنيه</span>
+            <span class="badge bg-light text-dark border">${p.area} م²</span>
+          </div>
+          <a href="${p.url}" class="btn btn-warning btn-sm w-100 mt-2">عرض التفاصيل</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+renderMarkers(props);
+
+let circle=null, circleMarker=null, circleMode=false;
+
+document.getElementById('circleMode').onclick=()=>{
+  circleMode=!circleMode;
+  const btn=document.getElementById('circleMode');
+  btn.textContent = circleMode ? '✅ اضغط على الخريطة الآن' : '📍 ارسم دائرة للبحث في التجمع';
+  btn.className = circleMode ? 'btn btn-success btn-sm w-100 mb-2' : 'btn btn-warning btn-sm w-100 mb-2';
+};
+
+document.getElementById('clearCircle').onclick=()=>{
+  if(circle) map.removeLayer(circle);
+  if(circleMarker) map.removeLayer(circleMarker);
+  circle=null; circleMarker=null;
+  document.getElementById('clearCircle').classList.add('d-none');
+  document.getElementById('circleResults').innerHTML='<div class="text-muted">تم مسح الدائرة - إظهار كل العقارات</div>';
+  renderMarkers(props);
+  document.getElementById('listBelowMap').innerHTML='';
+};
+
+document.getElementById('radiusInput').oninput=(e)=>{
+  document.getElementById('radiusVal').textContent = e.target.value + ' كم';
+  if(circle){
+    circle.setRadius(e.target.value*1000);
+    doCircleSearchClient();
+  }
+};
+
+map.on('click', (e)=>{
+  if(!circleMode) return;
+  if(circle) map.removeLayer(circle);
+  if(circleMarker) map.removeLayer(circleMarker);
+  const r = parseFloat(document.getElementById('radiusInput').value)*1000;
+  circle = L.circle(e.latlng, {radius:r, color:'#f59e0b', fillColor:'#f59e0b', fillOpacity:0.2, weight:3}).addTo(map);
+  circleMarker = L.marker(e.latlng).addTo(map);
+  circleMode=false;
+  document.getElementById('circleMode').textContent='📍 ارسم دائرة للبحث في التجمع';
+  document.getElementById('circleMode').className='btn btn-warning btn-sm w-100 mb-2';
+  document.getElementById('clearCircle').classList.remove('d-none');
+  doCircleSearchClient();
+});
+
+function doCircleSearchClient(){
+  if(!circle) return;
+  const c = circle.getLatLng();
+  const rad = circle.getRadius()/1000;
+  // حساب محلي بدون API
+  const inside = props.filter(p=>{
+    if(!p.lat || !p.lng) return false;
+    const d = haversine(c.lat, c.lng, p.lat, p.lng);
+    return d <= rad;
+  });
+  
+  // عرض النتائج في البوكس الجانبي
+  const resDiv=document.getElementById('circleResults');
+  resDiv.innerHTML = `
+    <div class="fw-bold text-success">🔍 وجدنا <b>${inside.length}</b> عقار في نطاق ${rad} كم</div>
+    <hr class="my-1">
+    ${inside.slice(0,20).map(p=>`<div class="mb-1">• <a href="${p.url}" target="_blank">${p.title.substring(0,28)}</a><br><small class="text-muted">${p.price.toLocaleString()} ج - ${p.area}م</small></div>`).join('')}
+    ${inside.length>20 ? `<small>+ ${inside.length-20} عقار آخر</small>` : ''}
+  `;
+  
+  renderMarkers(inside);
+  
+  // جرب كمان الـ API في الخلفية (لو شغال هيحدث)
+  try{
+    fetch('/api/properties-in-circle', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({lat:c.lat,lng:c.lng,radius:rad})})
+    .then(r=>r.json()).then(data=>{ console.log('API result:', data); }).catch(()=>{});
+  }catch(e){}
+}
+document.querySelectorAll('.area-btn').forEach(btn=>{
+  btn.onclick=()=>{ const lat=parseFloat(btn.dataset.lat); const lng=parseFloat(btn.dataset.lng); map.setView([lat,lng], 14); };
+});
+</script>
+{% endblock %}

@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <div class="card shadow-lg" style="border: none; border-radius: 15px;">
+                <div class="card-header" style="background: linear-gradient(135deg, #1a237e, #3949ab); color: white; border-radius: 15px 15px 0 0; padding: 20px;">
+                    <h3 class="mb-0" style="font-weight: 800;">
+                        <i class="bi bi-plus-circle"></i> {{ legend }}
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <b>فيه بيانات ناقصة:</b>
+                        <ul class="mb-0">
+                        {% for field, errors in form.errors.items() %}
+                          {% for error in errors %}
+                            <li>{{ field }}: {{ error }}</li>
+                          {% endfor %}
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if request.args.get('cleared') == '1' %}
+                    <div class="alert alert-success text-center" style="font-weight:700;">✅ تم الحفظ - الحقول اتفرغت تقدر تضيف عقار تاني</div>
+                    {% endif %}
+
+                    <form method="POST" action="" enctype="multipart/form-data" id="propertyForm">
+                        {{ form.hidden_tag() }}
+                        <div style="display:none;">
+                            {{ form.latitude(id="latitude") }}
+                            {{ form.longitude(id="longitude") }}
+                        </div>
+                        
+                        <!-- 1. الغرض ونوع العقار -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.type.label(class="form-label fw-bold") }}
+                                {{ form.type(class="form-select form-select-lg") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.property_type.label(class="form-label fw-bold") }}
+                                {{ form.property_type(class="form-select form-select-lg") }}
+                            </div>
+                        </div>
+
+                        <hr style="margin: 20px 0;">
+
+                        <!-- 2. الموقع -->
+                        <div class="mb-3">
+                            {{ form.location.label(class="form-label fw-bold") }}
+                            {% if form.location.errors %}
+                                {{ form.location(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.location.errors %}<span>{{ error }}</span>{% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.location(class="form-control form-control-lg", placeholder="مثال: التجمع الخامس - القاهرة الجديدة") }}
+                            {% endif %}
+                        </div>
+
+                        <!-- الخريطة -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold"><i class="bi bi-geo-alt"></i> حدد موقع العقار على الخريطة (اختياري لكن مهم)</label>
+                            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                            <div id="pickMap" style="height:320px; border-radius:12px; border:2px solid #ddd;"></div>
+                            <small class="text-muted">اضغط على الخريطة لتحديد المكان بدقة - هيساعد المشتري يوصلك</small>
+                        </div>
+
+                        <!-- 3. عنوان الاعلان -->
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label fw-bold") }}
+                            {% if form.title.errors %}
+                                {{ form.title(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}<span>{{ error }}</span>{% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.title(class="form-control form-control-lg", placeholder="مثال: شقة 200م للبيع في مدينتي") }}
+                            {% endif %}
+                        </div>
+
+                        <!-- 4. السعر + قابل للتفاوض -->
+                        <div class="row align-items-end">
+                            <div class="col-md-8 mb-3">
+                                {{ form.price.label(class="form-label fw-bold") }}
+                                {% if form.price.errors %}
+                                    {{ form.price(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.price.errors %}<span>{{ error }}</span>{% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.price(class="form-control form-control-lg", placeholder="السعر بالجنيه المصري") }}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check" style="padding: 15px; background-color: #f8f9fa; border-radius: 10px;">
+                                    {{ form.negotiable(class="form-check-input") }}
+                                    {{ form.negotiable.label(class="form-check-label fw-bold") }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr style="margin: 30px 0;">
+                        <h5 style="color: #1a237e; font-weight: 700; margin-bottom: 20px;">
+                            <i class="bi bi-house-door"></i> تفاصيل العقار
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                {{ form.area.label(class="form-label fw-bold") }}
+                                {{ form.area(class="form-control", placeholder="0") }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.bedrooms.label(class="form-label fw-bold") }}
+                                {{ form.bedrooms(class="form-control", placeholder="0") }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.bathrooms.label(class="form-label fw-bold") }}
+                                {{ form.bathrooms(class="form-control", placeholder="0") }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.finishing.label(class="form-label fw-bold") }}
+                            {{ form.finishing(class="form-select") }}
+                        </div>
+
+                        <hr style="margin: 30px 0;">
+
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label fw-bold") }}
+                            {{ form.description(class="form-control", rows="5", placeholder="اكتب وصف تفصيلي للعقار... المميزات، الخدمات، القرب من...") }}
+                        </div>
+
+                        <hr style="margin: 30px 0;">
+                        <h5 style="color: #1a237e; font-weight: 700; margin-bottom: 20px;">
+                            <i class="bi bi-telephone"></i> بيانات التواصل
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.phone.label(class="form-label fw-bold") }}
+                                {{ form.phone(class="form-control", id="phone", placeholder="010xxxxxxxx") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.whatsapp.label(class="form-label fw-bold") }}
+                                {{ form.whatsapp(class="form-control", id="whatsapp", placeholder="010xxxxxxxx") }}
+                                <small class="text-muted">لو تركته فارغ هيكون نفس رقم الموبايل</small>
+                            </div>
+                        </div>
+
+                        <hr style="margin: 30px 0;">
+
+                        <div class="mb-4">
+                            {{ form.pictures.label(class="form-label fw-bold") }}
+                            {{ form.pictures(class="form-control", multiple=True) }}
+                            <small class="text-muted">يمكنك اختيار أكثر من صورة - الصورة الأولى هي الرئيسية</small>
+                        </div>
+
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-lg", style="background-color: #1a237e; color: white; font-weight: bold; padding: 15px;") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var defaultLat = {{ form.latitude.data or 30.0444 }};
+var defaultLng = {{ form.longitude.data or 31.2357 }};
+var hasOldPos = {{ 'true' if form.latitude.data and form.longitude.data else 'false' }};
+var pickMap = L.map('pickMap').setView([defaultLat, defaultLng], hasOldPos ? 15 : 11);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickMap);
+var marker;
+if(hasOldPos){
+    marker = L.marker([defaultLat, defaultLng]).addTo(pickMap);
+}
+pickMap.on('click', function(e){
+    if(marker) pickMap.removeLayer(marker);
+    marker = L.marker(e.latlng).addTo(pickMap);
+    document.getElementById('latitude').value = e.latlng.lat;
+    document.getElementById('longitude').value = e.latlng.lng;
+});
+document.getElementById('phone').addEventListener('input', function() {
+    const whatsappField = document.getElementById('whatsapp');
+    if (whatsappField.value === '') {
+        whatsappField.value = this.value;
+    }
+});
+document.querySelector('form').addEventListener('submit', function() {
+    const phoneField = document.getElementById('phone');
+    const whatsappField = document.getElementById('whatsapp');
+    if (whatsappField.value.trim() === '') {
+        whatsappField.value = phoneField.value;
+    }
+});
+
+// تفريغ الحقول لو جاي من حفظ ناجح
+{% if request.args.get('cleared') == '1' %}
+document.addEventListener('DOMContentLoaded', function(){
+    // لا نفرغ الحقول يدوياً هنا لأن الصفحة جاية من سيرفر بفورم جديد فاضي
+    // فقط نشيل cleared من URL
+    if(window.history.replaceState){
+        const url = new URL(window.location);
+        url.searchParams.delete('cleared');
+        window.history.replaceState({}, '', url);
+    }
+});
+{% endif %}
+</script>
+{% endblock %}

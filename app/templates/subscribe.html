@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+<div class="row justify-content-center">
+<div class="col-md-6">
+<div class="card shadow">
+<div class="card-body">
+<h3 class="text-center">الاشتراك في {{ package.name }}</h3>
+<p class="text-center">السعر: <b class="text-success">{{ "{:,}".format(package.price) }} جنيه</b> - المدة: {{ package.duration_days }} يوم - {{ package.ads_count }} إعلان</p>
+<hr>
+<form method="POST" enctype="multipart/form-data">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="mb-3"><label>طريقة الدفع:</label>
+<select name="payment_method" class="form-select" required>
+<option value="vodafone_cash">فودافون كاش - 01155712096</option>
+<option value="instapay">إنستا باي</option>
+<option value="bank">تحويل بنكي</option>
+</select>
+</div>
+<div class="mb-3"><label>صورة إثبات الدفع (اختياري):</label><input type="file" name="screenshot" class="form-control" accept="image/*"></div>
+<button type="submit" class="btn btn-success w-100">تأكيد الاشتراك</button>
+</form>
+<div class="alert alert-info mt-3 text-center">سيتم تفعيل الباقة خلال 24 ساعة بعد مراجعة الإدارة.</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}

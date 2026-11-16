@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <!-- رسالة قيد المراجعة زي دوبيزل واوليكس -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'success' if category=='success' else category }} text-center p-4 shadow-sm border-0" style="border-radius:18px; font-size:18px;">
+            <h4 class="fw-bold mb-2">🎉 {{ message }}</h4>
+            <p class="mb-0 small text-muted">يمكنك متابعة حالة إعلانك هنا - حالة "قيد المراجعة" معناها أن الإدارة تراجعه الآن وسيتم نشره خلال دقائق</p>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0" style="color:#1a237e;"><i class="bi bi-card-list"></i> إعلاناتي</h2>
+        <a href="{{ url_for('main.create_property') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> أضف إعلان</a>
+    </div>
+
+    <!-- الاحصائيات -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card text-center p-3 border-0 shadow-sm" style="border-radius:15px;">
+                <h3 class="fw-bold mb-1">{{ total }}</h3>
+                <small class="text-muted">إجمالي الإعلانات</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center p-3 border-0 shadow-sm bg-success text-white" style="border-radius:15px;">
+                <h3 class="fw-bold mb-1">{{ active }}</h3>
+                <small>نشط ✅</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center p-3 border-0 shadow-sm bg-warning" style="border-radius:15px;">
+                <h3 class="fw-bold mb-1">{{ pending }}</h3>
+                <small>قيد المراجعة ⏳</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center p-3 border-0 shadow-sm bg-danger text-white" style="border-radius:15px;">
+                <h3 class="fw-bold mb-1">{{ expired }}</h3>
+                <small>منتهي ⛔</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- فلتر الحالة -->
+    <div class="d-flex gap-2 flex-wrap mb-4">
+        <a href="{{ url_for('main.my_ads', status='all') }}" class="btn btn-sm rounded-pill px-3 {{ 'btn-dark' if status_filter=='all' else 'btn-outline-dark' }}">الكل</a>
+        <a href="{{ url_for('main.my_ads', status='active') }}" class="btn btn-sm rounded-pill px-3 {{ 'btn-success' if status_filter=='active' else 'btn-outline-success' }}">نشط</a>
+        <a href="{{ url_for('main.my_ads', status='pending') }}" class="btn btn-sm rounded-pill px-3 {{ 'btn-warning' if status_filter=='pending' else 'btn-outline-warning' }}">قيد المراجعة</a>
+        <a href="{{ url_for('main.my_ads', status='expired') }}" class="btn btn-sm rounded-pill px-3 {{ 'btn-danger' if status_filter=='expired' else 'btn-outline-danger' }}">منتهي الصلاحية</a>
+        <a href="{{ url_for('main.my_ads', status='rejected') }}" class="btn btn-sm rounded-pill px-3 {{ 'btn-dark' if status_filter=='rejected' else 'btn-outline-secondary' }}">مرفوض</a>
+    </div>
+
+    <!-- قائمة الإعلانات -->
+    {% for prop in properties.items %}
+    <div class="card mb-3 border-0 shadow-sm overflow-hidden" style="border-radius:18px;">
+        <div class="row g-0">
+            <div class="col-md-3 position-relative">
+                {% if prop.images and prop.images|length > 0 %}
+                <img src="{{ url_for('static', filename='property_pics/' + prop.images[0].image_file) }}" style="height:200px; width:100%; object-fit:cover;">
+                {% else %}
+                <div style="height:200px; background:linear-gradient(135deg,#e8eaf6,#c5cae9);" class="d-flex align-items-center justify-content-center">
+                    <i class="bi bi-image" style="font-size:40px; color:#1a237e;"></i>
+                </div>
+                {% endif %}
+                
+                <!-- شارة الحالة -->
+                <div class="position-absolute top-0 end-0 m-2">
+                    {% if prop.is_expired %}
+                        <span class="badge bg-danger p-2"><i class="bi bi-x-circle"></i> منتهي</span>
+                    {% elif prop.is_rejected %}
+                        <span class="badge bg-dark p-2"><i class="bi bi-ban"></i> مرفوض</span>
+                    {% elif not prop.is_approved %}
+                        <span class="badge bg-warning text-dark p-2"><i class="bi bi-hourglass-split"></i> قيد المراجعة</span>
+                    {% elif prop.is_featured %}
+                        <span class="badge bg-warning text-dark p-2"><i class="bi bi-star-fill"></i> مميز</span>
+                    {% else %}
+                        <span class="badge bg-success p-2"><i class="bi bi-check-circle"></i> نشط</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-9 p-3 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="fw-bold mb-1">{{ prop.title }}</h5>
+                        <small class="text-muted">ID: {{ prop.id }}</small>
+                    </div>
+                    <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill"></i> {{ prop.location }} | {{ prop.property_type }} - {{ prop.type }}</p>
+                    
+                    <div class="d-flex gap-3 flex-wrap mb-2">
+                        <span class="badge bg-light text-dark border"><i class="bi bi-currency-dollar"></i> {{ "{:,.0f}".format(prop.price) }} جنيه</span>
+                        <span class="badge bg-light text-dark border"><i class="bi bi-eye"></i> {{ prop.views or 0 }} مشاهدة</span>
+                        <span class="badge bg-light text-dark border"><i class="bi bi-calendar"></i> {{ prop.date_posted.strftime('%Y-%m-%d') }}</span>
+                        <span class="badge bg-light text-dark border"><i class="bi bi-clock"></i> ينتهي: {{ prop.expires_at.strftime('%Y-%m-%d') if prop.expires_at else 'مفتوح' }}</span>
+                    </div>
+
+                    {% if prop.is_rejected and prop.rejection_reason %}
+                    <div class="alert alert-danger py-1 px-2 small mb-2"><i class="bi bi-info-circle"></i> سبب الرفض: {{ prop.rejection_reason }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap mt-2">
+                    <a href="{{ url_for('main.property_detail', property_id=prop.id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="bi bi-eye"></i> عرض</a>
+                    <a href="{{ url_for('main.update_property', property_id=prop.id) }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3"><i class="bi bi-pencil"></i> تعديل</a>
+                    
+                    {% if prop.is_expired %}
+                    <form method="POST" action="{{ url_for('main.renew_property', property_id=prop.id) }}" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-sm btn-warning rounded-pill px-3"><i class="bi bi-arrow-clockwise"></i> تجديد 30 يوم</button>
+                    </form>
+                    {% endif %}
+
+                    <form method="POST" action="{{ url_for('main.delete_property', property_id=prop.id) }}" onsubmit="return confirm('متأكد من حذف الإعلان نهائياً؟')" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="bi bi-trash"></i> حذف</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="card border-0 shadow-sm p-5" style="border-radius:20px;">
+            <i class="bi bi-inbox" style="font-size:60px; color:#c5cae9;"></i>
+            <h5 class="mt-3 text-muted">مفيش إعلانات في القسم ده</h5>
+            <p class="text-muted small">ابدأ دلوقتي وانشر أول عقار عندك</p>
+            <a href="{{ url_for('main.create_property') }}" class="btn btn-primary rounded-pill px-4 mt-2"><i class="bi bi-plus-lg"></i> أضف إعلانك الأول</a>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- pagination -->
+    {% if properties.pages > 1 %}
+    <nav class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            {% if properties.has_prev %}
+            <li class="page-item"><a class="page-link" href="{{ url_for('main.my_ads', page=properties.prev_num, status=status_filter) }}">السابق</a></li>
+            {% endif %}
+            {% for p in range(1, properties.pages+1) %}
+            <li class="page-item {{ 'active' if p==properties.page else '' }}"><a class="page-link" href="{{ url_for('main.my_ads', page=p, status=status_filter) }}">{{ p }}</a></li>
+            {% endfor %}
+            {% if properties.has_next %}
+            <li class="page-item"><a class="page-link" href="{{ url_for('main.my_ads', page=properties.next_num, status=status_filter) }}">التالي</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

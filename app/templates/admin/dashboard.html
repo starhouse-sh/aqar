@@ -1,237 +1,106 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container-fluid mt-4">
-    <h2 class="mb-4">👑 لوحة تحكم الادمن</h2>
-    
-    <!-- الاحصائيات -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h5 class="card-title">المستخدمين</h5>
-                    <h2>{{ total_users }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h5 class="card-title">الأدمنز</h5>
-                    <h2>{{ total_admins }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h5 class="card-title">العقارات المقبولة</h5>
-                    <h2>{{ approved_properties }}</h2>
-                </div>
-            </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-danger">
-                <div class="card-body">
-                    <h5 class="card-title">قيد المراجعة</h5>
-                    <h2>{{ pending_properties }}</h2>
-                </div>
-            </div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show mt-2">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% if pending_list %}
+<div class="alert alert-warning fs-5 mt-3 d-flex justify-content-between align-items-center">
+  <div>⏳ عندك <b>{{ pending_count }}</b> إعلان جديد قيد المراجعة - لازم توافق عليهم قبل ما يظهروا للعملاء</div>
+  <a href="{{ url_for('main.admin_properties_partial') }}" class="btn btn-dark">عرض المعلق فقط</a>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body"><h5>عدد المستخدمين</h5><h2>{{ total_users }}</h2></div>
         </div>
     </div>
-
-    <!-- جدول المستخدمين -->
-    <div class="card mb-4">
-        <div class="card-header bg-dark text-white">
-            <h5>آخر 10 مستخدمين</h5>
-        </div>
-        <div class="card-body">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>الاسم</th>
-                        <th>الايميل</th>
-                        <th>الدور</th>
-                        <th>التحكم</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td>{{ user.id }}</td>
-                        <td>{{ user.username }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>
-                            {% if user.role == 'super_admin' %}
-                                <span class="badge bg-danger">سوبر أدمن</span>
-                            {% elif user.role == 'admin' %}
-                                <span class="badge bg-warning text-dark">أدمن</span>
-                            {% else %}
-                                <span class="badge bg-secondary">مستخدم</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if user.id != current_user.id %}
-                                {% if user.role != 'super_admin' %}
-                                <form method="POST" action="{{ url_for('main.toggle_admin', user_id=user.id) }}" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm {% if user.role == 'admin' %}btn-danger{% else %}btn-success{% endif %}">
-                                        {% if user.role == 'admin' %}شيل أدمن{% else %}خليه أدمن{% endif %}
-                                    </button>
-                                </form>
-                                
-                                <form method="POST" action="{{ url_for('main.delete_user', user_id=user.id) }}" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('متأكد عايز تمسح المستخدم؟')">
-                                        🗑️ مسح
-                                    </button>
-                                </form>
-                                {% else %}
-                                <span class="badge bg-warning">محمي</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="text-muted">ده انت</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="col-md-3">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body"><h5>عدد العقارات</h5><h2>{{ total_properties }}</h2></div>
         </div>
     </div>
-
-    <!-- جدول العقارات قيد المراجعة - مع تحديث تلقائي -->
-    <div class="card mb-4">
-        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
-            <h5><i class="bi bi-clock"></i> عقارات قيد المراجعة (<span id="pending-count">{{ pending_properties }}</span>)</h5>
-            <small id="refresh-timer">تحديث تلقائي خلال 30 ثانية</small>
-        </div>
-        <div class="card-body">
-            <div id="pending-properties-list" 
-                 hx-get="{{ url_for('main.admin_properties_partial') }}" 
-                 hx-trigger="load, every 30s"
-                 hx-swap="innerHTML">
-                
-                <!-- الجدول القديم - هيتحمل أول مرة بس -->
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>العنوان</th>
-                            <th>السعر</th>
-                            <th>صاحب العقار</th>
-                            <th>التاريخ</th>
-                            <th>التحكم</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for prop in properties if not prop.is_approved %}
-                        <tr>
-                            <td>{{ prop.id }}</td>
-                            <td>{{ prop.title }}</td>
-                            <td>{{ "{:,.0f}".format(prop.price) }} جنيه</td>
-                            <td>{{ prop.author.username }}</td>
-                            <td>{{ prop.date_posted.strftime('%Y-%m-%d') }}</td>
-                            <td>
-                                <a href="{{ url_for('main.property_detail', property_id=prop.id) }}" class="btn btn-sm btn-info">👁️ عرض</a>
-                                
-                                <form method="POST" action="{{ url_for('main.approve_property', property_id=prop.id) }}" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-success">
-                                        ✅ موافقة
-                                    </button>
-                                </form>
-                                
-                                <form method="POST" action="{{ url_for('main.delete_property', property_id=prop.id) }}" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('متأكد عايز تمسح العقار؟')">
-                                        🗑️ رفض ومسح
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="6" class="text-center text-muted">لا توجد عقارات قيد المراجعة</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body"><h5>بانتظار الموافقة</h5><h2>{{ pending_count }}</h2></div>
         </div>
     </div>
-
-    <!-- جدول العقارات المقبولة -->
-    <div class="card">
-        <div class="card-header bg-success text-white">
-            <h5><i class="bi bi-check-circle"></i> العقارات المقبولة ({{ approved_properties }})</h5>
-        </div>
-        <div class="card-body">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>العنوان</th>
-                        <th>السعر</th>
-                        <th>صاحب العقار</th>
-                        <th>التاريخ</th>
-                        <th>التحكم</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for prop in properties if prop.is_approved %}
-                    <tr>
-                        <td>{{ prop.id }}</td>
-                        <td>{{ prop.title }}</td>
-                        <td>{{ "{:,.0f}".format(prop.price) }} جنيه</td>
-                        <td>{{ prop.author.username }}</td>
-                        <td>{{ prop.date_posted.strftime('%Y-%m-%d') }}</td>
-                        <td>
-                            <a href="{{ url_for('main.property_detail', property_id=prop.id) }}" class="btn btn-sm btn-info">👁️ عرض</a>
-                            
-                            <form method="POST" action="{{ url_for('main.approve_property', property_id=prop.id) }}" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-warning">
-                                    ❌ إلغاء القبول
-                                </button>
-                            </form>
-                            
-                            <form method="POST" action="{{ url_for('main.delete_property', property_id=prop.id) }}" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('متأكد عايز تمسح العقار؟')">
-                                    🗑️ مسح
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center text-muted">لا توجد عقارات مقبولة حتى الآن</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger h-100">
+            <div class="card-body"><h5>المراجعة</h5><h2>{{ pending_count }}</h2></div>
         </div>
     </div>
 </div>
 
-<script>
-// عداد التحديث التلقائي
-(function() {
-    var seconds = 30;
-    var timerElement = document.getElementById('refresh-timer');
-    
-    if (!timerElement) return;
-    
-    function updateTimer() {
-        seconds = seconds - 1;
-        if(seconds <= 0){
-            seconds = 30;
-        }
-        timerElement.textContent = 'تحديث تلقائي خلال ' + seconds + ' ثانية';
-    }
-    
-    setInterval(updateTimer, 1000);
-    
-    document.body.addEventListener('htmx:afterSwap', function(evt) {
-        if (evt.detail.target.id === 'pending-properties-list') {
-            seconds = 30;
-        }
-    });
-})();
-</script>
+<div class="card mb-4 mt-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between">
+        <h5>آخر 10 مستخدمين</h5>
+        <a href="{{ url_for('main.manage_admins') }}" class="btn btn-sm btn-light">عرض الكل</a>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-striped">
+            <thead><tr><th>ID</th><th>الاسم</th><th>ايميل</th><th>الدور</th><th>التحكم</th></tr></thead>
+            <tbody>
+                {% for user in users %}
+                <tr><td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.email }}</td><td>{{ user.role }}</td><td><a href="{{ url_for('main.manage_admins') }}" class="btn btn-sm btn-primary">ادارة</a></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">آخر العقارات {% if pending_count > 0 %}<span class="badge bg-warning text-dark">{{ pending_count }} معلق</span>{% endif %}</h5>
+        <a href="{{ url_for('main.admin_properties_partial') }}" class="btn btn-sm btn-warning">عرض المعلق فقط</a>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-striped align-middle">
+            <thead><tr><th>العنوان</th><th>السعر</th><th>الموقع</th><th>الحالة</th><th>مميز</th><th style="min-width:360px;">تحكم</th></tr></thead>
+            <tbody>
+                {% for prop in properties %}
+                <tr class="{% if not prop.is_approved and not prop.is_rejected %}table-warning fw-bold{% elif prop.is_rejected %}table-danger{% elif prop.is_featured_active %}table-success{% endif %}">
+                    <td>{{ prop.title[:30] }} {% if prop.is_featured_active %}⭐{% endif %}</td>
+                    <td>{{ prop.price }}</td>
+                    <td>{{ prop.location }} {% if prop.latitude %}<i class="bi bi-geo-alt-fill text-success"></i>{% endif %}</td>
+                    <td>
+                        {% if prop.is_approved %}<span class="badge bg-success">مقبول</span>
+                        {% elif prop.is_rejected %}<span class="badge bg-danger">مرفوض</span>
+                        {% else %}<span class="badge bg-warning text-dark">⏳ معلق</span>{% endif %}
+                        {% if prop.is_expired %}<span class="badge bg-secondary">منتهي</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if prop.is_featured_active %}<span class="badge" style="background:#FFD700; color:#1a237e;">مميز حتى {{ prop.featured_until.strftime('%m-%d') if prop.featured_until }}</span>
+                        {% else %}<span class="badge bg-light text-dark">عادي</span>{% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <a href="{{ url_for('main.property_detail', property_id=prop.id) }}" target="_blank" class="btn btn-sm btn-info">عرض</a>
+                            {% if not prop.is_approved %}
+                            <form method="POST" action="{{ url_for('main.approve_property', property_id=prop.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-success">موافقة</button></form>
+                            {% endif %}
+                            {% if not prop.is_rejected %}
+                            <form method="POST" action="{{ url_for('main.reject_property', property_id=prop.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="reason" value="غير مطابق"><button class="btn btn-sm btn-danger">رفض</button></form>
+                            {% endif %}
+                            {% if not prop.is_featured_active %}
+                            <form method="POST" action="{{ url_for('main.feature_property', property_id=prop.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="days" value="7"><button class="btn btn-sm" style="background:#FFD700; color:#1a237e; font-weight:700;">⭐ ميز</button></form>
+                            {% else %}
+                            <form method="POST" action="{{ url_for('main.unfeature_property', property_id=prop.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-outline-warning">إلغاء</button></form>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('main.delete_property', property_id=prop.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-outline-dark" onclick="return confirm('حذف نهائي؟')">حذف</button></form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

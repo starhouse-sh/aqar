@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4" dir="rtl">
+  <h3>🔐 صلاحيات {{ user.username }} 
+    {% if user.role == 'super_admin' %}<span class="badge bg-danger">سوبر أدمن</span>
+    {% else %}<span class="badge bg-primary">أدمن</span>{% endif %}
+  </h3>
+  <p class="text-muted">{{ user.email }} - {{ user.phone }}</p>
+
+  <div class="alert alert-warning">
+    ⚠️ <strong>تنبيه:</strong> صلاحية <code>إنشاء سوبر أدمن</code> للمالك فقط ولا يمكن منحها - الصلاحيات محفوظة ولا تفقد ✅
+  </div>
+
+  <form method="POST" action="{{ url_for('main.update_permissions', user_id=user.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-3">
+          <div class="card-header bg-primary text-white">🏠 العقارات</div>
+          <div class="card-body">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="can_approve" id="can_approve" {% if user.permissions and user.permissions.get('can_approve') %}checked{% endif %}>
+              <label class="form-check-label" for="can_approve">الموافقة على العقارات</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="can_reject" id="can_reject" {% if user.permissions and user.permissions.get('can_reject') %}checked{% endif %}>
+              <label class="form-check-label" for="can_reject">رفض العقارات</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="can_delete" id="can_delete" {% if user.permissions and user.permissions.get('can_delete') %}checked{% endif %}>
+              <label class="form-check-label" for="can_delete">مسح العقارات نهائياً</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="can_feature" id="can_feature" {% if user.permissions and user.permissions.get('can_feature') %}checked{% endif %}>
+              <label class="form-check-label" for="can_feature">تثبيت عقار مميز</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3" style="border:2px solid #FFD700;">
+          <div class="card-header" style="background:#FFD700; color:#1a237e; font-weight:800;">👑 إدارة المشرفين (جديد)</div>
+          <div class="card-body">
+            <div class="form-check mb-2" style="background:#fff8dc; padding:10px; border-radius:8px;">
+              <input class="form-check-input" type="checkbox" name="can_add_admin" id="can_add_admin" {% if user.permissions and user.permissions.get('can_add_admin') %}checked{% endif %}>
+              <label class="form-check-label" for="can_add_admin"><strong>➕ إضافة أدمن جديدة / ترقية عميل إلى أدمن</strong></label>
+              <br><small class="text-muted">لو فعّلتها: المستخدم يقدر يضيف أدمن جديد ويرقي العملاء إلى أدمن - الزر هيظهر في صفحته</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card mb-3">
+          <div class="card-header bg-dark text-white">👥 المستخدمين والمراقبة</div>
+          <div class="card-body">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="can_ban_user" id="can_ban_user" {% if user.permissions and user.permissions.get('can_ban_user') %}checked{% endif %}>
+              <label class="form-check-label" for="can_ban_user">حظر مستخدم</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="can_view_logs" id="can_view_logs" {% if user.permissions and user.permissions.get('can_view_logs') %}checked{% endif %}>
+              <label class="form-check-label" for="can_view_logs">مشاهدة سجل الحركات</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="can_view_messages" id="can_view_messages" {% if user.permissions and user.permissions.get('can_view_messages') %}checked{% endif %}>
+              <label class="form-check-label" for="can_view_messages">مشاهدة رسائل تواصل معنا</label>
+            </div>
+            <div class="form-check mb-2" style="background:#fff3cd; padding:10px; border-radius:8px;">
+              <input class="form-check-input" type="checkbox" name="can_monitor_chats" id="can_monitor_chats" {% if user.permissions and user.permissions.get('can_monitor_chats') %}checked{% endif %}>
+              <label class="form-check-label" for="can_monitor_chats"><strong>🕵️ مراقبة محادثات الموظفين</strong></label>
+              <br><small class="text-muted">لو فعلتها: الأدمن يقدر يشوف شات الموظفين في /admin/monitor</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          <strong>✅ الحفظ الدائم:</strong> كل الصلاحيات دي بتتحفظ في قاعدة البيانات (عمود permissions) ومش بتضيع حتى لو عملت تحديث للموقع
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-success btn-lg w-100" style="background:#1a237e; border:none; font-weight:800;">💾 حفظ الصلاحيات - محفوظة للأبد ✅</button>
+  </form>
+
+  <a href="{{ url_for('main.manage_admins') }}" class="btn btn-secondary mt-3">⬅️ رجوع إدارة المشرفين</a>
+</div>
+{% endblock %}

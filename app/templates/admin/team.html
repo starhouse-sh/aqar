@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-3">
+  <h3>👥 إدارة فريق العمل - إضافة أدمن</h3>
+  <div class="alert alert-info">
+    {% if current_user.is_owner %}انت المالك 👑 تقدر تضيف أدمن وسوبر أدمن
+    {% else %}انت سوبر أدمن معك صلاحية تعيين أدمن - تقدر ترقي عميل عادي لأدمن عادي فقط{% endif %}
+  </div>
+  <div class="card p-3 mb-4">
+    <h5>➕ ترقية عميل لأدمن</h5>
+    <form method="POST" action="/admin/promote" class="row g-2">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="col-md-5"><input type="text" name="email" class="form-control" placeholder="ايميل أو رقم موبايل العميل" required></div>
+      <div class="col-md-3">
+        <select name="role" class="form-select">
+          <option value="admin">أدمن عادي</option>
+          {% if current_user.is_owner %}<option value="super_admin">سوبر أدمن</option>{% endif %}
+        </select>
+      </div>
+      <div class="col-md-4"><button class="btn btn-success w-100">ترقية / إضافة أدمن</button></div>
+    </form>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h5>المشرفين الحاليين</h5>
+      <ul class="list-group">
+      {% for a in admins %}
+        <li class="list-group-item d-flex justify-content-between">
+          <div><strong>{{ a.username }}</strong><br><small>{{ a.email }}</small></div>
+          {% if not a.is_owner %}
+          <form method="POST" action="/admin/demote/{{ a.id }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-outline-danger">إلغاء</button></form>
+          {% endif %}
+        </li>
+      {% endfor %}
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <h5>آخر العملاء</h5>
+      <ul class="list-group">
+      {% for u in users %}
+        <li class="list-group-item d-flex justify-content-between">
+          <div><strong>{{ u.username }}</strong><br><small>{{ u.email }}</small></div>
+          <form method="POST" action="/admin/promote"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="email" value="{{ u.email }}"><input type="hidden" name="role" value="admin"><button class="btn btn-sm btn-primary">رقي لأدمن</button></form>
+        </li>
+      {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

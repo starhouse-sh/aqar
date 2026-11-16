@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>🔍 مطلوب عقار - Star House</h3>
+    <a href="{{ url_for('main.wanted_new_clean') }}" class="btn btn-warning">+ أضف طلبك</a>
+  </div>
+  <div class="row">
+  {% for w in wanted.items %}
+    <div class="col-md-6 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5>{{ w.title }}</h5>
+          <p class="small">📍 {{ w.location }} | 💰 {{ w.budget_min }} - {{ w.budget_max }}</p>
+          <p class="small text-muted">{{ w.description[:100] if w.description else '' }}</p>
+          <small>📞 {{ w.phone }} - بواسطة {{ w.author.username if w.author else '' }}</small>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <p>لا يوجد طلبات حالياً، كن أول من يضيف!</p>
+  {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4"><h3>🎟️ الكوبونات</h3>
+<form method="POST" action="{{url_for('main.new_coupon')}}" class="row g-2 mb-3"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><div class="col"><input name="code" placeholder="كود مثل STAR50" class="form-control" required></div><div class="col"><input name="discount" type="number" placeholder="خصم %" class="form-control" required></div><div class="col"><button class="btn btn-primary">إنشاء</button></div></form>
+{% for c in coupons %}<div class="card mb-2"><div class="card-body">{{c.action}}</div></div>{% endfor %}</div>{% endblock %}

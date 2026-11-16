@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4"><h3>🔍 عمليات البحث المحفوظة</h3>
+{% for s in searches %}<div class="card mb-2"><div class="card-body">{{s.action}} - {{s.timestamp}}</div></div>{% else %}<p>لا يوجد</p>{% endfor %}
+</div>{% endblock %}

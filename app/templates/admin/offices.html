@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4" dir="rtl">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>🏢 إدارة المكاتب</h3>
+    <div>
+      {# زرار إدارة المشرفين - للمالك فقط - مخفي عن السوبر أدمن نهائياً #}
+      {% if current_user.is_owner %}
+      <a href="{{ url_for('main.manage_admins') }}" class="btn btn-warning mb-2" style="background:#FFD700; color:#1a237e; font-weight:800;">إدارة المشرفين 👑</a>
+      {% endif %}
+      <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary mb-2">لوحة التحكم</a>
+    </div>
+  </div>
+
+  {% if current_user.is_owner %}
+  <div class="alert alert-success py-2">👑 انت المالك - عندك كل الصلاحيات</div>
+  {% elif current_user.role == 'super_admin' %}
+  <div class="alert alert-info py-2">⭐ سوبر أدمن: تقدر تدير المكاتب والعقارات - إدارة المشرفين للمالك فقط</div>
+  {% endif %}
+
+  <table class="table table-bordered mt-3">
+    <thead><tr><th>المكتب</th><th>الهاتف</th><th>موثق؟</th><th>إجراءات</th></tr></thead>
+    <tbody>
+    {% for office in offices %}
+      <tr>
+        <td>{{ office.company_name or office.username }}<br><small class="text-muted">{{ office.email }}</small></td>
+        <td>{{ office.phone }}</td>
+        <td>{% if office.is_verified %}✅{% else %}❌{% endif %}</td>
+        <td>
+          <form method="POST" action="{{ url_for('main.verify_office', user_id=office.id) }}" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-success">توثيق</button>
+          </form>
+          <form method="POST" action="{{ url_for('main.block_office', user_id=office.id) }}" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-danger">حظر</button>
+          </form>
+          <form method="POST" action="{{ url_for('main.unblock_office', user_id=office.id) }}" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-secondary">فك حظر</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

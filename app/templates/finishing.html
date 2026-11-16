@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4" dir="rtl" style="max-width:700px;">
+  <h3>🎨 حاسبة التشطيب</h3>
+  <div class="card p-4 shadow">
+    <div class="row g-3">
+      <div class="col-md-6"><label>المساحة م²</label><input type="number" id="area" class="form-control" value="100"></div>
+      <div class="col-md-6"><label>المستوى</label><select id="level" class="form-select"><option>اقتصادي</option><option selected>متوسط</option><option>فاخر</option><option>سوبر لوكس</option></select></div>
+    </div>
+    <button onclick="calc2()" class="btn btn-dark w-100 mt-3">احسب</button>
+    <div id="result2" class="mt-4 alert alert-info d-none"></div>
+  </div>
+</div>
+<script>
+function calc2(){
+  let area=parseFloat(document.getElementById('area').value);
+  let level=document.getElementById('level').value;
+  fetch(`/api/finishing-calc?area=${area}&level=${level}`).then(r=>r.json()).then(d=>{
+    document.getElementById('result2').classList.remove('d-none');
+    document.getElementById('result2').innerHTML=`سعر المتر: ${d.per_meter} ج<br>الإجمالي: ${d.total.toLocaleString()} ج<br>دهانات: ${d.breakdown['دهانات'].toLocaleString()}<br>سباكة وكهرباء: ${d.breakdown['سباكة وكهرباء'].toLocaleString()}<br>أرضيات: ${d.breakdown['أرضيات'].toLocaleString()}`;
+  });
+}
+calc2();
+</script>
+{% endblock %}

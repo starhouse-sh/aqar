@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card" style="border:none; border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,0.15);">
+        <div class="card-body p-4 p-md-5">
+          <h3 class="fw-bold mb-1" style="color:#1a237e;"><i class="bi bi-calculator"></i> تقدير سعر عقارك</h3>
+          <p class="text-muted small mb-4">الحساب يتم بناءً على متوسط أسعار العقارات المشابهة في قاعدة البيانات + سعر المنطقة</p>
+
+          <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">المنطقة</label>
+                <input type="text" name="location" class="form-control" placeholder="مثال: التجمع الخامس، زايد..." value="{{ location or '' }}" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold">النوع</label>
+                <select name="property_type" class="form-select">
+                  <option value="شقة" {% if property_type=='شقة' %}selected{% endif %}>شقة</option>
+                  <option value="فيلا" {% if property_type=='فيلا' %}selected{% endif %}>فيلا</option>
+                  <option value="أرض" {% if property_type=='أرض' %}selected{% endif %}>أرض</option>
+                  <option value="محل" {% if property_type=='محل' %}selected{% endif %}>محل</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold">المساحة (م²)</label>
+                <input type="number" name="area" class="form-control" value="{{ area or 100 }}" min="10" required>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-primary w-100 btn-lg" style="background:#1a237e; font-weight:800; border-radius:12px;">احسب السعر الآن</button>
+              </div>
+            </div>
+          </form>
+
+          {% if estimated is defined %}
+          <div class="mt-4 p-4" style="background: linear-gradient(135deg, #1a237e, #3949ab); border-radius:15px; color:white;">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <small style="opacity:0.8;">السعر المقدر لـ {{ area }}م² في {{ location }} - {{ property_type }}</small>
+                <h2 class="fw-bold mt-1 mb-0">{{ "{:,.0f}".format(estimated) }} جنيه</h2>
+                {% if avg_from_db %}
+                <small style="opacity:0.9;">متوسط من {{ count_db }} عقارات مشابهة: {{ "{:,.0f}".format(avg_from_db) }} ج.م /م²</small>
+                {% endif %}
+                <div class="mt-2 small" style="opacity:0.8; line-height:1.6;">
+                  <b>طريقة الحساب:</b><br>
+                  1- بنجيب متوسط سعر المتر من عقاراتك المنشورة بنفس المنطقة (لو موجود)<br>
+                  2- لو مفيش، بنستخدم خريطة أسعار المناطق: التجمع 25ألف، زايد 20ألف، أكتوبر 15ألف، المعادي 18ألف، مصر الجديدة 22ألف<br>
+                  3- بنضرب في المساحة + معامل النوع: فيلا ×1.5، محل ×2
+                </div>
+              </div>
+              <div style="font-size:3rem;">💰</div>
+            </div>
+            <a href="{{ url_for('main.create_property') }}" class="btn btn-warning mt-3 w-100 fw-bold" style="border-radius:10px;">➕ انشر عقارك بهذا السعر</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

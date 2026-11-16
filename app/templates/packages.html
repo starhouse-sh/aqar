@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+<h2 class="text-center mb-4">💎 باقات الإعلانات</h2>
+<div class="row">
+{% for pkg in packages %}
+<div class="col-md-4 mb-4">
+<div class="card shadow h-100 {% if pkg.is_featured_included %}border-warning border-2{% endif %}">
+{% if pkg.is_featured_included %}<div class="card-header bg-warning text-center fw-bold">⭐ باقة مميزة</div>{% endif %}
+<div class="card-body text-center">
+<h4>{{ pkg.name }}</h4>
+<h2 class="text-success">{{ "{:,}".format(pkg.price) }} ج</h2>
+<p class="text-muted">{{ pkg.duration_days }} يوم</p>
+<ul class="list-unstyled text-start">
+<li>✔ {{ pkg.ads_count }} إعلان</li>
+{% if pkg.is_featured_included %}<li>✔ تثبيت مميز في الصفحة الرئيسية</li>{% endif %}
+<li>✔ {{ pkg.description or 'دعم فني' }}</li>
+</ul>
+<a href="{{ url_for('main.subscribe_package', package_id=pkg.id) }}" class="btn btn-primary w-100">اشترك الآن</a>
+</div>
+</div>
+</div>
+{% else %}
+<div class="col-12 text-center py-5"><h5>لا يوجد باقات - أضف من لوحة التحكم</h5><p class="text-muted">ادخل /admin/packages</p></div>
+{% endfor %}
+</div>
+</div>
+{% endblock %}

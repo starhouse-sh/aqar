@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4" style="max-width:600px"><h3>📅 حجز معاينة: {{prop.title}}</h3>
+<form method="POST"><input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+<div class="mb-3"><label>التاريخ</label><input type="date" name="visit_date" class="form-control" required></div>
+<div class="mb-3"><label>الوقت</label><input type="time" name="visit_time" class="form-control" required></div>
+<div class="mb-3"><label>ملاحظات</label><textarea name="notes" class="form-control"></textarea></div>
+<button class="btn btn-success w-100">تأكيد الحجز</button></form></div>{% endblock %}

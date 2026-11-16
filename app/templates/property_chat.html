@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4" style="max-width:700px"><h3>💬 شات مع {{prop.user.username}} حول {{prop.title}}</h3>
+<div style="height:400px;overflow-y:auto;border:1px solid #ddd;padding:10px" class="mb-3">
+{% for m in messages %}<div class="{% if m.sender_id==current_user.id %}text-end{% endif %} mb-2"><small>{{m.sender.username}}:</small> {{m.content}}<br><small class="text-muted">{{m.timestamp}}</small></div>{% endfor %}
+</div><form method="POST"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><div class="input-group"><input name="content" class="form-control" placeholder="اكتب رسالتك..." required><button class="btn btn-primary">إرسال</button></div></form></div>{% endblock %}

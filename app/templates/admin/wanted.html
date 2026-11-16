@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3>📋 طلبات مطلوبة - بانتظار الموافقة</h3>
+  <table class="table">
+    <thead class="table-dark">
+      <tr>
+        <th>العنوان</th>
+        <th>المستخدم</th>
+        <th>التاريخ</th>
+        <th>تحكم</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for req in wanted %}
+      <tr>
+        <td><strong>{{ req.title }}</strong><br><small>{{ req.location }} - {{ req.budget }}</small></td>
+        <td>{{ req.author.username if req.author else '-' }}</td>
+        <td><small>{{ req.created_at.strftime('%Y-%m-%d') }}</small></td>
+        <td>
+          {% if not req.is_approved %}
+          <form method="POST" action="{{ url_for('main.approve_wanted', req_id=req.id) }}" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-success btn-sm">موافقة</button>
+          </form>
+          {% endif %}
+          <form method="POST" action="{{ url_for('main.delete_wanted', req_id=req.id) }}" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-danger btn-sm">حذف</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

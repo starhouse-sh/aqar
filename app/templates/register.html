@@ -1,74 +1,60 @@
 {% extends "base.html" %}
 {% block title %}تسجيل حساب جديد{% endblock %}
-
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <h2 class="mb-4">تسجيل حساب جديد</h2>
-        <form method="POST">
-            {{ form.hidden_tag() }}
+<div class="container mt-5" style="max-width: 500px;">
+    <div class="card shadow">
+        <div class="card-body p-4">
+            <h3 class="text-center mb-4">تسجيل حساب جديد</h3>
+            <p class="text-center text-muted">سجل برقم موبايلك فقط</p>
             
-            <!-- 👇 ضيف البلوك ده كله 👇 -->
-            <div class="mb-3">
-                {{ form.username.label(class="form-label") }}
-                {% if form.username.errors %}
-                    {{ form.username(class="form-control is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.username.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.username(class="form-control") }}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
                 {% endif %}
-            </div>
+            {% endwith %}
 
-            <div class="mb-3">
-                {{ form.email.label(class="form-label") }}
-                {% if form.email.errors %}
-                    {{ form.email(class="form-control is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.email.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.email(class="form-control") }}
-                {% endif %}
-            </div>
+            <form method="POST" action="{{ url_for('main.register') }}" autocomplete="off">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    <label class="form-label">اسم المستخدم</label>
+                    <input type="text" name="username" class="form-control" placeholder="مثال: ahmed123" value="" autocomplete="off">
+                    {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors[0] }}</div>{% endif %}
+                </div>
 
-            <div class="mb-3">
-                {{ form.password.label(class="form-label") }}
-                {% if form.password.errors %}
-                    {{ form.password(class="form-control is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.password.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.password(class="form-control") }}
-                {% endif %}
-            </div>
+                <div class="mb-3">
+                    <label class="form-label">رقم الموبايل</label>
+                    <input type="text" name="phone" class="form-control" placeholder="01123456789" value="" autocomplete="off">
+                    {% if form.phone.errors %}<div class="text-danger small">{{ form.phone.errors[0] }}</div>{% endif %}
+                    {% if form.identifier is defined and form.identifier.errors %}<div class="text-danger small">{{ form.identifier.errors[0] }}</div>{% endif %}
+                </div>
 
-            <div class="mb-3">
-                {{ form.confirm_password.label(class="form-label") }}
-                {% if form.confirm_password.errors %}
-                    {{ form.confirm_password(class="form-control is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.confirm_password.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.confirm_password(class="form-control") }}
-                {% endif %}
-            </div>
+                <div class="mb-3">
+                    <label class="form-label">كلمة السر</label>
+                    <input type="password" name="password" class="form-control" placeholder="6 حروف على الأقل" value="" autocomplete="new-password">
+                </div>
 
-            <div class="mb-3">
-                {{ form.submit(class="btn btn-primary") }}
-            </div>
-        </form>
+                <div class="mb-3">
+                    <label class="form-label">تأكيد كلمة السر</label>
+                    <input type="password" name="confirm_password" class="form-control" placeholder="اكتب الباسورد تاني" value="" autocomplete="new-password">
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">تسجيل</button>
+                </div>
+
+                <div class="text-center mt-3">
+                    <p>عندك حساب؟ <a href="{{ url_for('main.login') }}">سجل دخول</a></p>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+<script>
+window.onload = function() {
+    document.querySelectorAll('input').forEach(i => { if(i.type != 'hidden') i.value = ''; });
+}
+</script>
 {% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <div class="card p-3 mb-4" style="border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+    <form method="GET" action="{{ url_for('main.advanced_search') }}">
+      <div class="row g-2">
+        <div class="col-md-9">
+          <input type="text" name="q" class="form-control" placeholder="ابحث بعنوان العقار، المكان، النوع... شقه = شقة" value="{{ request.args.get('q','') }}">
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary w-100" style="font-weight:800;">🔍 بحث</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <h5 class="mb-3" style="color:#1a237e; font-weight:800;">{% if active_filter %}نتائج بحث: {{ active_filter }}{% else %}البحث المتقدم{% endif %} - {{ properties.total }} عقار</h5>
+
+  <div class="row">
+    {% for prop in properties.items %}
+    <div class="col-md-4 mb-4">
+      <a href="{{ url_for('main.property_detail', property_id=prop.id) }}" class="text-decoration-none">
+        <div class="card h-100 shadow-sm" style="border-radius:12px; overflow:hidden;">
+          {% if prop.images and prop.images|length>0 %}
+          <img src="{{ url_for('static', filename='property_pics/' + prop.images[0].image_file) }}" style="height:200px; object-fit:cover;" class="card-img-top">
+          {% endif %}
+          <div class="card-body">
+            <h6 class="fw-bold text-dark">{{ prop.title[:50] }}</h6>
+            <p class="text-muted small">{{ prop.location }}</p>
+            <div class="fw-bold text-primary">{{ "{:,.0f}".format(prop.price) }} جنيه</div>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5"><h4>لا يوجد نتائج</h4><p class="text-muted">جرب كتابة شقه بدل شقة، أو ارض بدل أرض</p></div>
+    {% endfor %}
+  </div>
+
+  {% if properties.pages > 1 %}
+  <nav><ul class="pagination justify-content-center">
+    {% for p in range(1, properties.pages+1) %}
+    <li class="page-item {% if p==properties.page %}active{% endif %}"><a class="page-link" href="{{ url_for('main.advanced_search', page=p, q=request.args.get('q','')) }}">{{ p }}</a></li>
+    {% endfor %}
+  </ul></nav>
+  {% endif %}
+</div>
+{% endblock %}

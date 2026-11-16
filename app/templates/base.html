@@ -1,88 +1,132 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    {% if title %}
-        <title>Aqar Star House | عقار ستار هاوس - {{ title }}</title>
-    {% else %}
-        <title>Aqar Star House | عقار ستار هاوس - نجوم عقارات التجمع الخامس</title>
-    {% endif %}
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
-    <style>
-        .navbar-brand img {
-            height: 40px;
-            margin-left: 10px;
-        }
-        .navbar-brand {
-            font-weight: bold;
-            color: #FFD700 !important;
-        }
-        .bg-dark {
-            background-color: #1a237e !important;
-        }
-        .btn-primary {
-            background-color: #1a237e;
-            border-color: #1a237e;
-        }
-        .btn-primary:hover {
-            background-color: #0d1456;
-            border-color: #0d1456;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<title>{% if title %}Star House - {{ title }}{% else %}Star House{% endif %}</title>
+
+<!-- ===== PWA ===== -->
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#1a237e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Star House">
+<link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+
+<style>
+.flash-container{position:fixed;top:15px;left:50%;transform:translateX(-50%);z-index:9999;width:90%;max-width:500px}
+.flash-msg{margin-bottom:8px;padding:10px 15px;border-radius:10px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:flex;justify-content:space-between;align-items:center}
+.flash-success{background:#d1e7dd;color:#0f5132;border:1px solid #badbcc}
+.flash-danger{background:#f8d7da;color:#842029;border:1px solid #f5c2c7}
+.flash-warning{background:#fff3cd;color:#664d03;border:1px solid #ffecb5}
+.flash-info{background:#cff4fc;color:#055160;border:1px solid #b6effb}
+.btn-add{background:#0d6efd;color:white;font-weight:800;border-radius:20px;padding:6px 18px}
+</style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.home') }}">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="Aqar Star House">
-                <span>عقار ستار هاوس</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="navbar-nav me-auto">
-                    <a class="nav-link" href="{{ url_for('main.home') }}">الرئيسية</a>
-                </div>
-                <div class="navbar-nav">
-                    {% if current_user.is_authenticated %}
-                        <a class="nav-link" href="{{ url_for('main.create_property') }}"><i class="bi bi-plus-circle"></i> إضافة عقار</a>
-                       
-                        <a class="nav-link" href="{{ url_for('main.logout') }}">خروج</a>
-                    {% else %}
-                        <a class="nav-link" href="{{ url_for('main.login') }}">دخول</a>
-                        <a class="nav-link" href="{{ url_for('main.register') }}">تسجيل حساب</a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </nav>
+<body style="background:#f8f9fa;">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container" id="flashContainer">
+    {% for category, message in messages[-2:] %}
+    <div class="flash-msg flash-{{ category }}"><span>{{ message }}</span><button style="background:none;border:none;" onclick="this.parentElement.remove()">✕</button></div>
+    {% endfor %}
+  </div>
+  <script>setTimeout(function(){const c=document.getElementById('flashContainer');if(c){c.style.opacity='0';setTimeout(()=>c.remove(),500);}},2500);</script>
+  {% endif %}
+{% endwith %}
 
-    <main class="container mt-4">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="/">⭐ Star House</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.home') }}">الرئيسية</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.offices_list_public') }}">🏢 المكاتب</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.wanted_list_clean') }}">🔎 مطلوب</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.packages_page') }}">💎 الباقات</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.reels_page') }}" style="color:#ff6b6b;font-weight:700;">🎬 ريلز</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.advanced_search') }}">🔍 بحث متقدم</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.compare_page') }}">⚖ مقارنة</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.favorites') }}">❤ مفضلة</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.interactive_map_clean') }}" style="color:#FFD700;">🗺 الخريطة</a></li>
+
+        {% if current_user.is_authenticated %}
+          {% if current_user.role in ['admin','super_admin'] or current_user.is_owner %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" style="color:#FFD700;font-weight:700;">📊 لوحة التحكم</a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard') }}">📊 الرئيسية</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.offices_list') }}">🏢 إدارة المكاتب</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.admin_leads') }}">📞 العملاء المحتملين</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.commissions_list') }}">💰 العمولات 2.5%</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.tasks_list_new20') }}">📋 المهام</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.team_management') }}">👥 الفرق</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.chat_list') }}">💬 شات الموظفين</a></li>
+                {% if current_user.is_owner %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.backup_db') }}" style="color:green;font-weight:bold;">💾 نسخ احتياطي</a></li>
+                {% endif %}
+              </ul>
+            </li>
+            {% if current_user.is_owner or current_user.role == 'super_admin' or current_user.has_perm('can_add_admin') %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.manage_admins') }}" style="background:#FFD700;color:#1a237e;border-radius:8px;margin:2px 5px;font-weight:800;">👑 المشرفين</a></li>
             {% endif %}
-        {% endwith %}
-        
-        {% block content %}{% endblock %}
-    </main>
+          {% endif %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.my_ads') }}">📄 إعلاناتي</a></li>
+        {% endif %}
+      </ul>
+      <ul class="navbar-nav">
+        {% if current_user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.mortgage_page_final') }}">🏦 تمويل</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.finishing_page_final') }}">🎨 تشطيب</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.estimate_price') }}">💰 تقدير سعر</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.notifications') }}">🔔</a></li>
+          <li class="nav-item"><a class="nav-link btn btn-add ms-2" href="{{ url_for('main.create_property') }}">➕ إضافة عقار</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.logout') }}">خروج</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.mortgage_page_final') }}">🏦 تمويل</a></li>
+          <li class="nav-item"><a class="nav-link btn btn-add ms-2" href="{{ url_for('main.create_property') }}">➕ إضافة عقار</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.login') }}">دخول</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.register') }}">تسجيل</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
 
-    <footer class="bg-dark text-white text-center py-3 mt-5">
-        <div class="container">
-            <p class="mb-0">© 2026 Aqar Star House - عقار ستار هاوس | نجوم عقارات التجمع الخامس ⭐</p>
-        </div>
-    </footer>
+{% block content %}{% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<footer class="bg-dark text-light text-center py-3 mt-5"><div>⭐ Star House | 01155712096 | <a href="/privacy" class="text-warning">الخصوصية</a> - <a href="/terms" class="text-warning">الشروط</a></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ===== PWA Install + Service Worker ===== -->
+<button id="installBtn" class="btn btn-warning" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9999; border-radius:20px; font-weight:800; box-shadow:0 4px 15px rgba(0,0,0,0.3);">📱 ثبت التطبيق</button>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js');
+}
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = 'block';
+});
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') installBtn.style.display = 'none';
+  deferredPrompt = null;
+});
+window.addEventListener('appinstalled', () => {
+  installBtn.style.display = 'none';
+});
+</script>
 </body>
 </html>

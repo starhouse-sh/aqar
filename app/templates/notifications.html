@@ -1,0 +1,2 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4"><h3>🔔 الإشعارات</h3>{% for n in notifications %}<div class="card mb-2"><div class="card-body">{{n.action}} - {{n.timestamp}}</div></div>{% else %}<p>لا يوجد إشعارات</p>{% endfor %}</div>{% endblock %}

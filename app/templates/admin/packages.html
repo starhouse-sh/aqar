@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+<h3>إدارة الباقات</h3>
+<a href="/admin/packages" class="btn btn-success mb-3">+ إضافة</a>
+<table class="table table-bordered">
+<tr><th>الاسم</th><th>السعر</th><th>حذف</th></tr>
+{% for pkg in packages %}
+<tr>
+<td>{{ pkg.name }}</td><td>{{ pkg.price }}</td>
+<td>
+<form method="POST" action="/admin/packages/delete/{{ pkg.id }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<button class="btn btn-danger btn-sm">حذف</button>
+</form>
+</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+{% endblock %}

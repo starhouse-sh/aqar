@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between">
+    <h3>🔍 عقارات مطلوبة - العملاء بتدور (SEO قوي)</h3>
+    <a href="{{ url_for('main.create_wanted') }}" class="btn btn-primary">+ أضف طلبك</a>
+  </div>
+
+  <div class="row mt-4">
+    {% for req in wanted.items %}
+    <div class="col-md-6 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5>{{ req.title }}</h5>
+          <p class="text-muted small">📍 {{ req.location }} | 💰 {{ req.budget }} جنيه | {{ req.property_type }}</p>
+          <p>{{ req.description[:100] }}</p>
+          <div class="d-flex justify-content-between">
+            <small>📞 {{ req.phone }}</small>
+            <small>{{ req.created_at.strftime('%Y-%m-%d') }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+      <p>لسه مفيش طلبات - كون أول واحد!</p>
+      <a href="{{ url_for('main.create_wanted') }}" class="btn btn-primary">أضف طلب عقار مطلوب</a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <nav class="mt-4">
+    {% if wanted.has_prev %}<a href="?page={{ wanted.prev_num }}" class="btn btn-outline-primary">السابق</a>{% endif %}
+    {% if wanted.has_next %}<a href="?page={{ wanted.next_num }}" class="btn btn-outline-primary">التالي</a>{% endif %}
+  </nav>
+</div>
+{% endblock %}

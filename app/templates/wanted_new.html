@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4" style="max-width:600px">
+  <div class="card p-4 shadow">
+    <h3>➕ أضف طلب عقار مطلوب</h3>
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>عنوان الطلب</label><input name="title" class="form-control mb-2" placeholder="مثال: مطلوب شقة 3 غرف في التجمع" required>
+      <label>المنطقة</label><input name="location" class="form-control mb-2" placeholder="التجمع الخامس" required>
+      <div class="row"><div class="col"><label>من</label><input name="budget_min" type="number" class="form-control mb-2"></div><div class="col"><label>إلى</label><input name="budget_max" type="number" class="form-control mb-2"></div></div>
+      <label>تفاصيل إضافية</label><textarea name="description" class="form-control mb-2"></textarea>
+      <label>رقم التواصل</label><input name="phone" class="form-control mb-3" required>
+      <button class="btn btn-warning w-100">نشر الطلب ✅</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

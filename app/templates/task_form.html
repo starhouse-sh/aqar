@@ -1,0 +1,6 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4" style="max-width:600px"><h3>➕ مهمة جديدة</h3>
+<form method="POST"><input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+<input name="title" class="form-control mb-3" placeholder="عنوان المهمة" required>
+<select name="assignee_id" class="form-control mb-3">{% for u in users %}<option value="{{u.id}}">{{u.username}} - {{u.role}}</option>{% endfor %}</select>
+<button class="btn btn-success w-100">إنشاء</button></form></div>{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4"><h3>🏢 لوحة تحكم المكتب - CRM</h3>
+<div class="row"><div class="col-md-3"><div class="card text-center p-3 bg-primary text-white">المكالمات<br>{{stats.calls}}</div></div>
+<div class="col-md-3"><div class="card text-center p-3 bg-success text-white">واتساب<br>{{stats.whatsapp}}</div></div>
+<div class="col-md-3"><div class="card text-center p-3 bg-warning">زيارات<br>{{stats.visits}}</div></div>
+<div class="col-md-3"><div class="card text-center p-3 bg-dark text-white">إجمالي<br>{{stats.total}}</div></div></div>
+<hr><h4>آخر الليدز</h4><table class="table"><tr><th>ID</th><th>عقار</th><th>نوع</th><th>تاريخ</th></tr>
+{% for l in leads %}<tr><td>{{l.id}}</td><td>{{l.property_id}}</td><td>{{l.contact_type}}</td><td>{{l.created_at}}</td></tr>{% endfor %}
+</table></div>{% endblock %}

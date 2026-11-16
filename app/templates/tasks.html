@@ -1,0 +1,3 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4"><h3>📝 المهام</h3><a href="{{url_for('main.new_task_new20')}}" class="btn btn-primary mb-3">+ مهمة جديدة</a>
+{% for t in tasks %}<div class="card mb-2"><div class="card-body">{{t.action}} - {{t.timestamp}}</div></div>{% else %}<p>لا يوجد مهام</p>{% endfor %}</div>{% endblock %}

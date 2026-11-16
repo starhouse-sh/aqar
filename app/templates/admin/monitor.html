@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h4>🕵️ مراقبة محادثات الموظفين</h4>
+        <div>
+            <a href="{{ url_for('main.manage_admins') }}" class="btn btn-sm btn-secondary">رجوع للإدارة</a>
+            <a href="{{ url_for('main.chat_list') }}" class="btn btn-sm btn-primary"><i class="bi bi-chat-dots-fill"></i> الشات الخاص بي</a>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        <i class="bi bi-shield-lock-fill"></i> هذه الصفحة للمالك فقط <strong>admin@admin.com</strong> أو أي سوبر أدمن معه صلاحية <code>can_monitor_chats</code>. كل الدخول هنا يتسجل في سجل الحركات.
+    </div>
+
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('main.monitor_chats') }}" class="row g-2">
+                <div class="col-md-4">
+                    <label class="form-label small">فلتر بالموظف:</label>
+                    <select name="user_id" class="form-select">
+                        <option value="">-- كل الموظفين --</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}" {% if filter_user_id == u.id %}selected{% endif %}>{{ u.username }} - {{ u.email }} ({{ u.role }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label small">بحث في نص الرسالة:</label>
+                    <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="مثلاً: شكوى، عميل، نصب، فلوس...">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-dark w-100"><i class="bi bi-search"></i> بحث وفلترة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between">
+            <span>آخر 200 رسالة بين الموظفين (الأحدث أولاً)</span>
+            <span class="badge bg-light text-dark">{{ messages|length }} رسالة</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="min-width:130px;">الوقت</th>
+                        <th style="min-width:150px;">من</th>
+                        <th style="min-width:150px;">إلى</th>
+                        <th>الرسالة / الملف</th>
+                        <th style="min-width:80px;">تحكم</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msg in messages %}
+                    <tr>
+                        <td><small>{{ msg.timestamp.strftime('%Y-%m-%d %I:%M %p') }}</small></td>
+                        <td>
+                            <strong>{{ msg.sender.username }}</strong><br>
+                            <small class="text-muted">{{ msg.sender.email }}</small><br>
+                            {% if msg.sender.email == "admin@admin.com" %}<span class="badge bg-dark">مالك</span>{% elif msg.sender.role == 'super_admin' %}<span class="badge bg-warning text-dark">سوبر</span>{% else %}<span class="badge bg-info">أدمن</span>{% endif %}
+                        </td>
+                        <td>
+                            <strong>{{ msg.receiver.username }}</strong><br>
+                            <small class="text-muted">{{ msg.receiver.email }}</small>
+                        </td>
+                        <td style="max-width: 450px; word-break: break-word;">
+                            {% if msg.content %}<div class="mb-1">{{ msg.content }}</div>{% endif %}
+                            {% if msg.file_path %}
+                                {% if msg.file_type == 'image' %}
+                                    <a href="{{ url_for('static', filename=msg.file_path) }}" target="_blank">
+                                        <img src="{{ url_for('static', filename=msg.file_path) }}" style="max-width:150px; border-radius:8px; margin-top:5px; border:1px solid #ddd;">
+                                    </a>
+                                {% elif msg.file_type == 'video' %}
+                                    <video controls style="max-width:200px; border-radius:8px; margin-top:5px;">
+                                        <source src="{{ url_for('static', filename=msg.file_path) }}">
+                                    </video>
+                                {% else %}
+                                    <a href="{{ url_for('static', filename=msg.file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary mt-1">تحميل الملف</a>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('main.delete_monitored_message', msg_id=msg.id) }}" onsubmit="return confirm('هل أنت متأكد من مسح هذه الرسالة نهائياً من قاعدة البيانات؟')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-danger" title="مسح"><i class="bi bi-trash-fill"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center p-4 text-muted">لا توجد رسائل بهذا الفلتر 🔍</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

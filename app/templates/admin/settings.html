@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3>⚙️ تحكم المالك - لوحة التحكم الكاملة</h3>
+
+  <div class="card shadow mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between">
+      <span>🕹️ وضع الموقع</span>
+      <span class="badge {% if settings.is_free_mode %}bg-success{% else %}bg-danger{% endif %} fs-6">
+        {% if settings.is_free_mode %}🟢 مجاني{% else %}🔴 بباقات{% endif %}
+      </span>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-check form-switch" style="font-size:1.8rem;">
+          <input class="form-check-input" type="checkbox" name="is_free_mode" {% if settings.is_free_mode %}checked{% endif %} style="width:3em; height:1.5em;">
+          <label class="form-check-label me-3"><strong>الوضع المجاني؟</strong></label>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-3"><label>فرد (مجاني)</label><input type="number" name="free_all_ind" value="{{ settings.free_ads_for_individual or 100 }}" class="form-control"></div>
+          <div class="col-md-3"><label>مكتب (مجاني)</label><input type="number" name="free_all_office" value="{{ settings.free_ads_for_office or 100 }}" class="form-control"></div>
+          <div class="col-md-3"><label>فرد (بباقات)</label><input type="number" name="free_ind" value="{{ settings.free_ads_when_paid_individual or 2 }}" class="form-control"></div>
+          <div class="col-md-3"><label>مكتب (بباقات)</label><input type="number" name="free_office" value="{{ settings.free_ads_when_paid_office or 10 }}" class="form-control"></div>
+        </div>
+        <button class="btn btn-primary w-100 mt-3">💾 حفظ</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-4"><div class="card p-3 text-center shadow-sm"><h1>🏢</h1><h5>توثيق المكاتب</h5><a href="{{ url_for('main.offices_list') }}" class="btn btn-success w-100">توثيق المكاتب</a></div></div>
+    <div class="col-md-4"><div class="card p-3 text-center shadow-sm"><h1>📞</h1><h5>سجل المكالمات</h5><a href="{{ url_for('main.admin_leads') }}" class="btn btn-primary w-100">المكالمات</a></div></div>
+    <div class="col-md-4"><div class="card p-3 text-center shadow-sm"><h1>💳</h1><h5>الاشتراكات</h5><a href="{{ url_for('main.admin_subscriptions') }}" class="btn btn-warning w-100">الاشتراكات</a></div></div>
+    <div class="col-md-4"><div class="card p-3 text-center shadow-sm"><h1>🔍</h1><h5>طلبات مطلوب</h5><a href="{{ url_for('main.admin_wanted') }}" class="btn btn-info w-100">طلبات مطلوب</a></div></div>
+
+    {% if current_user.has_perm('can_monitor_chats') %}
+    <div class="col-md-4">
+      <div class="card p-3 text-center shadow-sm border-success border-2">
+        <h1>🕵️</h1><h5>مراقبة الشات</h5>
+        {% if current_user.is_owner %}<span class="badge bg-warning">مالك 👑</span>{% else %}<span class="badge bg-success">صلاحية ممنوحة ✅</span>{% endif %}
+        <a href="{{ url_for('main.monitor_chats') }}" class="btn btn-success w-100 mt-2">مراقبة الشات</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="col-md-4"><div class="card p-3 text-center shadow-sm"><h1>👥</h1><h5>إدارة المشرفين</h5><p class="small text-muted">هنا تدي صلاحية المراقبة لمسعد 2</p><a href="{{ url_for('main.manage_admins') }}" class="btn btn-secondary w-100">المشرفين</a></div></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="p-4 bg-light rounded mb-4 border">
+    <h1>شقق للبيع في {{ city }} {{ ptype }} - Star House ⭐</h1>
+    <p>أفضل {{ properties.total }} عقار للبيع في {{ city }} - أسعار منافسة وتشطيبات متنوعة. منصة Star House تضمن لك عقارات موثقة وموثوقة.</p>
+    <p class="small text-muted">SEO Landing Page - هذه الصفحة مُحسّنة لمحركات البحث لجذب زيارات من جوجل</p>
+  </div>
+  <div class="row">
+  {% for prop in properties.items %}
+    <div class="col-md-4 mb-3"><div class="card h-100"><div class="card-body"><h6>{{ prop.title }}</h6><small>{{ prop.location }} - {{ prop.price }} جنيه</small><br><a href="{{ url_for('main.property_detail', property_id=prop.id) }}" class="btn btn-sm btn-dark mt-2">تفاصيل</a></div></div></div>
+  {% endfor %}
+  </div>
+</div>
+{% endblock %}

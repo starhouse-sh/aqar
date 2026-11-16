@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+<h3>طلبات الاشتراكات</h3>
+<table class="table table-bordered mt-3">
+<thead class="table-light"><tr><th>المستخدم</th><th>الباقة</th><th>طريقة الدفع</th><th>الإثبات</th><th>التاريخ</th><th>الحالة</th><th>تحكم</th></tr></thead>
+<tbody>
+{% for sub in subscriptions %}
+<tr>
+<td>{{ sub.user.username }}<br><small>{{ sub.user.email }}</small></td>
+<td>{{ sub.package.name }} - {{ sub.package.price }}ج</td>
+<td>{{ sub.payment_method }}</td>
+<td>{% if sub.screenshot %}<a href="{{ url_for('static', filename='uploads/' + sub.screenshot) }}" target="_blank">عرض الصورة</a>{% else %}-{% endif %}</td>
+<td>{{ sub.created_at.strftime('%Y-%m-%d') }}</td>
+<td>{% if sub.status == 'pending' %}<span class="badge bg-warning">معلق</span>{% elif sub.status == 'approved' %}<span class="badge bg-success">مقبول</span>{% else %}<span class="badge bg-danger">مرفوض</span>{% endif %}</td>
+<td>
+{% if sub.status == 'pending' %}
+<form method="POST" action="{{ url_for('main.admin_approve_subscription', sub_id=sub.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="approve"><button class="btn btn-sm btn-success">قبول</button></form>
+<form method="POST" action="{{ url_for('main.admin_approve_subscription', sub_id=sub.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="reject"><button class="btn btn-sm btn-danger">رفض</button></form>
+{% endif %}
+</td>
+</tr>
+{% else %}
+<tr><td colspan="7" class="text-center">لا يوجد اشتراكات</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

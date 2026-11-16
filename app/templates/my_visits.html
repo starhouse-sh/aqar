@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}
+<div class="container mt-4"><h3>📋 حجوزاتي</h3>
+{% for v in visits %}<div class="card mb-2"><div class="card-body">{{v.action}} - {{v.timestamp}}</div></div>{% else %}<p>لا يوجد حجوزات</p>{% endfor %}
+</div>{% endblock %}

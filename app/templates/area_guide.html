@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="p-4 bg-dark text-white rounded mb-4" style="background:linear-gradient(135deg,#111,#333)">
+    <h1>📍 عقارات {{ area_name or 'المنطقة' }}</h1>
+    <p>عدد العقارات: <b>{{ total_count }}</b> | متوسط السعر: <b>{{ "{:,}".format(avg_price) }} جنيه</b> | منصة Star House ⭐</p>
+    <a href="{{ url_for('main.interactive_map_clean') }}?area={{ area_name }}" class="btn btn-warning btn-sm">شوف على الخريطة 🗺️</a>
+  </div>
+  <div class="row">
+  {% for prop in properties.items %}
+    <div class="col-md-4 mb-3">
+      <div class="card h-100">
+        {% if prop.images %}<img src="{{ url_for('static', filename='property_pics/' + prop.images[0].image_file) }}" class="card-img-top" style="height:200px;object-fit:cover">{% endif %}
+        <div class="card-body">
+          <h6>{{ prop.title[:60] }}</h6>
+          <small>{{ prop.location }} - {{ prop.price }} جنيه</small><br>
+          <a href="{{ url_for('main.property_detail', property_id=prop.id) }}" class="btn btn-sm btn-dark mt-2">تفاصيل</a>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <p class="text-center">لا يوجد عقارات في {{ area_name }} حالياً - كن أول من يضيف!</p>
+  {% endfor %}
+  </div>
+  {% if properties.pages > 1 %}
+  <nav><ul class="pagination">
+    {% for p in range(1, properties.pages+1) %}<li class="page-item {% if p==properties.page %}active{% endif %}"><a class="page-link" href="?page={{p}}">{{p}}</a></li>{% endfor %}
+  </ul></nav>
+  {% endif %}
+</div>
+{% endblock %}

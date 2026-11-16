@@ -1,104 +1,139 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container mt-4">
-    <h2>إدارة المشرفين</h2>
-    
-    <h4 class="mt-4">المشرفين الحاليين</h4>
+<div class="container mt-4" dir="rtl">
+  <h3>👑 إدارة المشرفين</h3>
+  
+  {% if current_user.is_owner %}
+  <div class="alert alert-success">👑 انت المالك - تقدر تضيف سوبر أدمن وأدمن عادي + تمنح كل الصلاحيات</div>
+  {% elif current_user.role == 'super_admin' %}
+  <div class="alert alert-info">
+    ⭐ سوبر أدمن: 
+    {% if current_user.has_perm('can_add_admin') %}
+      ✅ معاك صلاحية إضافة أدمن عادي
+    {% else %}
+      ❌ معاكش صلاحية إضافة أدمن - اطلبها من المالك
+    {% endif %}
+  </div>
+  {% elif current_user.role == 'admin' %}
+  <div class="alert alert-secondary">
+    🛡️ أدمن: 
+    {% if current_user.has_perm('can_add_admin') %}
+      ✅ معاك صلاحية إضافة أدمن عادي
+    {% else %}
+      ❌ معاكش صلاحية إضافة أدمن
+    {% endif %}
+  </div>
+  {% endif %}
 
-<!-- فورم بحث عن مستخدم لترقيته -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5>ترقية مستخدم عادي</h5>
-    </div>
+  {# نموذج إضافة أدمن جديد - يظهر فقط لو معاك صلاحية can_add_admin أو انت المالك #}
+  {% if current_user.is_owner or current_user.has_perm('can_add_admin') %}
+  <div class="card mb-4" style="border:2px solid #FFD700;">
     <div class="card-body">
-        <form method="POST" action="{{ url_for('main.promote_user') }}">
-            <div class="row">
-                <div class="col-md-8">
-                    <input type="email" name="email" class="form-control" 
-                           placeholder="ابحث بايميل المستخدم..." required>
-                </div>
-                <div class="col-md-2">
-                    <select name="role" class="form-select">
-                        <option value="admin">ادمن</option>
-                        {% if current_user.role == 'super_admin' %}
-                        <option value="super_admin">سوبر ادمن</option>
-                        {% endif %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-success w-100">ترقية</button>
-                </div>
-            </div>
-        </form>
-    </div>
-
-
-    <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>الايميل</th>
-            <th>الاسم</th>
-            <th>الدور</th>
-            <th>عدد العقارات</th>
-            <th>اخر دخول</th>
-            <th>اجراء</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for admin in admins %}
-        <tr>
-            <td>{{ admin.email }}</td>
-            <td>{{ admin.username }}</td>
-            <td>
-                {% if admin.role == 'super_admin' %}
-                    <span class="badge bg-danger">سوبر ادمن</span>
-                {% else %}
-                    <span class="badge bg-primary">ادمن</span>
-                {% endif %}
-            </td>
-            <td>{{ admin.properties|length }}</td>
-            <td>{{ admin.last_login.strftime('%Y-%m-%d') if admin.last_login else 'لم يسجل' }}</td>
-            <td>
-                <!-- الحماية: محدش يلغي سوبر ادمن + محدش يلغي نفسه -->
-                {% if admin.role != 'super_admin' and admin.id != current_user.id %}
-                <form method="POST" action="{{ url_for('main.demote_admin', user_id=admin.id) }}" style="display:inline;">
-                    <button type="submit" class="btn btn-sm btn-warning" 
-                            onclick="return confirm('متأكد تلغي اشراف {{ admin.username }}؟')">
-                        إلغاء الإشراف
-                    </button>
-                </form>
-                {% elif admin.id == current_user.id %}
-                    <span class="text-muted">ده انت</span>
-                {% else %}
-                    <span class="text-muted">محمي</span>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-    <h4 class="mt-5">ترقية مستخدم عادي</h4>
-    <form method="POST" action="/admin/promote">
-        <div class="row">
-            <div class="col-md-6">
-                <select name="user_id" class="form-select">
-                    {% for user in users %}
-                        <option value="{{ user.id }}">{{ user.email }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-4">
-                <select name="role" class="form-select">
-                    <option value="admin">ادمن</option>
-                    <option value="super_admin">سوبر ادمن</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-success">ترقية</button>
-            </div>
+      <h5>➕ ترقية عميل إلى مشرف</h5>
+      <form method="POST" action="{{ url_for('main.promote_user') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="row g-2">
+          <div class="col-md-5">
+            <input name="email" class="form-control" placeholder="ايميل أو موبايل العميل" required>
+          </div>
+          <div class="col-md-3">
+            <select name="role" class="form-select" required>
+              <option value="admin">أدمن عادي</option>
+              {% if current_user.is_owner %}
+              <option value="super_admin">سوبر أدمن (للمالك فقط)</option>
+              {% endif %}
+            </select>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-primary w-100">ترقية + إضافة</button>
+          </div>
         </div>
-    </form>
+      </form>
+      <small class="text-muted mt-2 d-block">
+        {% if current_user.is_owner %}
+        • المالك: تقدر تختار سوبر أدمن أو أدمن عادي<br>
+        {% else %}
+        • تقدر تضيف أدمن عادي فقط - سوبر أدمن للمالك فقط<br>
+        {% endif %}
+        • اكتب ايميل أو موبايل العميل الموجود - الصلاحية محفوظة ✅
+      </small>
+    </div>
+  </div>
+  {% else %}
+  <div class="card mb-4" style="border:1px dashed #ccc; background:#f9f9f9;">
+    <div class="card-body text-center text-muted">
+      🔒 لا تملك صلاحية إضافة أدمن - اطلب صلاحية "إضافة أدمن جديدة" من المالك
+    </div>
+  </div>
+  {% endif %}
+
+  {# جدول المشرفين الحاليين #}
+  <h5>المشرفين الحاليين:</h5>
+  <table class="table table-bordered">
+    <thead><tr><th>الاسم</th><th>ايميل/موبايل</th><th>الدور</th><th>الصلاحيات</th><th>إجراء</th></tr></thead>
+    <tbody>
+    {% for admin in admins %}
+      <tr style="{% if admin.is_owner %}background:#fff3cd{% endif %}">
+        <td>{{ admin.username }} {% if admin.is_owner %}👑{% endif %}</td>
+        <td>{{ admin.email }}<br><small>{{ admin.phone }}</small></td>
+        <td>
+          {% if admin.is_owner %}<span class="badge bg-warning text-dark">مالك</span>
+          {% elif admin.role == 'super_admin' %}<span class="badge bg-danger">سوبر أدمن</span>
+          {% else %}<span class="badge bg-primary">أدمن</span>{% endif %}
+          {% if admin.permissions %}
+            <br><small class="text-muted" style="font-size:0.7rem;">
+            {% for k,v in admin.permissions.items() %}
+              {% if v %}✅ {{ k|replace('can_','') }} {% endif %}
+            {% endfor %}
+            </small>
+          {% endif %}
+        </td>
+        <td>
+          {% if not admin.is_owner and admin.id != current_user.id %}
+            {% if current_user.is_owner %}
+              <a href="{{ url_for('main.manage_permissions', user_id=admin.id) }}" class="btn btn-sm btn-dark" style="background:#1a237e;">
+                🔐 صلاحيات
+              </a>
+            {% elif current_user.role == 'super_admin' and admin.role == 'admin' %}
+              <a href="{{ url_for('main.manage_permissions', user_id=admin.id) }}" class="btn btn-sm btn-outline-dark">
+                🔐 صلاحيات
+              </a>
+            {% elif current_user.role == 'admin' and admin.role == 'admin' and current_user.has_perm('can_add_admin') %}
+              {# الأدمن اللي معاه صلاحية إضافة أدمن يقدر يعدل صلاحيات أدمن تاني #}
+              <a href="{{ url_for('main.manage_permissions', user_id=admin.id) }}" class="btn btn-sm btn-outline-secondary">
+                🔐 صلاحيات
+              </a>
+            {% else %}
+              <small class="text-muted">-</small>
+            {% endif %}
+          {% else %}
+            <small class="text-muted">-</small>
+          {% endif %}
+        </td>
+        <td>
+          {% if not admin.is_owner and admin.id != current_user.id %}
+            {% if current_user.is_owner %}
+              <form method="POST" action="{{ url_for('main.demote_admin', user_id=admin.id) }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-danger">إلغاء</button>
+              </form>
+            {% elif (current_user.role == 'super_admin' or (current_user.role == 'admin' and current_user.has_perm('can_add_admin'))) and admin.role == 'admin' %}
+              <form method="POST" action="{{ url_for('main.demote_admin', user_id=admin.id) }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-outline-danger">إلغاء</button>
+              </form>
+            {% else %}
+              <small class="text-muted">لا يمكن</small>
+            {% endif %}
+          {% else %}
+            <small>انت</small>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">⬅️ رجوع لوحة التحكم</a>
 </div>
 {% endblock %}

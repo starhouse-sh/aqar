@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">🔄 مقارنة العقارات</h2>
+    {% if properties|length == 0 %}
+    <div class="text-center py-5"><h4>لا يوجد عقارات في المقارنة</h4><a href="{{ url_for('main.home') }}" class="btn btn-primary mt-3">تصفح العقارات</a></div>
+    {% else %}
+    <div class="d-flex justify-content-between mb-3"><span>{{ properties|length }} عقار للمقارنة</span><button onclick="clearCompare()" class="btn btn-sm btn-danger">مسح الكل</button></div>
+    <div class="table-responsive"><table class="table table-bordered text-center align-middle"><thead class="table-light"><tr><th>الخاصية</th>{% for prop in properties %}<th>{{ prop.title[:20] }}<br><button onclick="removeCompare({{ prop.id }})" class="btn btn-sm btn-outline-danger mt-1">× حذف</button></th>{% endfor %}</tr></thead>
+    <tbody>
+    <tr><th>الصورة</th>{% for prop in properties %}<td>{% if prop.images %}<img src="{{ url_for('static', filename='property_pics/' + prop.images[0].image_file) }}" width="150" height="100" style="object-fit:cover;border-radius:5px">{% endif %}</td>{% endfor %}</tr>
+    <tr><th>السعر</th>{% for prop in properties %}<td class="text-success fw-bold">{{ "{:,}".format(prop.price) }} ج</td>{% endfor %}</tr>
+    <tr><th>الموقع</th>{% for prop in properties %}<td>{{ prop.location }}</td>{% endfor %}</tr>
+    <tr><th>النوع</th>{% for prop in properties %}<td>{{ prop.property_type }} / {{ prop.type }}</td>{% endfor %}</tr>
+    <tr><th>المساحة</th>{% for prop in properties %}<td>{{ prop.area }} م²</td>{% endfor %}</tr>
+    <tr><th>غرف / حمام</th>{% for prop in properties %}<td>{{ prop.bedrooms }} / {{ prop.bathrooms }}</td>{% endfor %}</tr>
+    <tr><th>تفاصيل</th>{% for prop in properties %}<td><a href="{{ url_for('main.property_detail', property_id=prop.id) }}" class="btn btn-sm btn-primary">عرض</a></td>{% endfor %}</tr>
+    </tbody></table></div>{% endif %}
+</div>
+<script>
+function removeCompare(id){fetch('/compare/remove/'+id,{method:'POST',headers:{'X-CSRFToken':'{{ csrf_token() }}'}}).then(()=>location.reload());}
+function clearCompare(){if(confirm('مسح كل المقارنة؟')){fetch('/compare/clear',{method:'POST',headers:{'X-CSRFToken':'{{ csrf_token() }}'}}).then(()=>location.reload());}}
+</script>
+{% endblock %}
