@@ -1,7 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- ===== HERO MODERN + CATEGORIES ===== -->
+<!-- ===== HERO MODERN + CATEGORIES - GLASS 1 بدون اعداد ===== -->
+<style>
+.cat-glass-wrap{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:0 auto;max-width:900px;padding:0 12px}
+.cat-glass{flex:1;min-width:130px;max-width:170px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px 18px 12px;text-decoration:none!important;background:rgba(255,255,255,.08);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.15);border-radius:24px;color:#E5E7EB;transition:.25s}
+.cat-glass:hover{transform:translateY(-3px);background:rgba(255,255,255,.14);color:#fff}
+.cat-glass i{font-size:32px;line-height:1}
+.cat-glass span{font-size:16px;font-weight:800}
+.cat-glass.active{background:rgba(253,230,138,.16);border:1.5px solid #FDE68A;color:#FDE68A;box-shadow:0 0 0 1px #FDE68A,0 12px 35px rgba(253,230,138,.35)}
+.cat-glass.active i{filter:drop-shadow(0 0 8px #FDE68A)}
+@media(max-width:768px){.cat-glass-wrap{gap:8px}.cat-glass{min-width:0;flex:1 1 30%;padding:14px 6px 12px 6px;border-radius:18px}.cat-glass i{font-size:26px}.cat-glass span{font-size:14px}}
+</style>
+
 <div style="background: radial-gradient(1200px 600px at 90% -20%, rgba(255,215,0,0.15), transparent), linear-gradient(135deg, #0d124a 0%, #1a237e 50%, #283593 100%); padding: 45px 0 90px 0; position: relative;">
     <div class="container text-center">
         <h1 class="fw-bold mb-2" style="color: white; font-size: 2.4rem; letter-spacing: -0.5px;">
@@ -9,69 +20,23 @@
         </h1>
         <p class="mb-4" style="color: rgba(255,255,255,0.85); font-size: 1.05rem;">اكتشف أفضل العقارات بأسعار حقيقية ومحدثة يومياً</p>
 
-        <!-- تصفح حسب النوع - مع زرار الكل -->
-        <div class="row g-2 justify-content-center" style="max-width: 850px; margin: 0 auto;">
-            <div class="col-6 col-md-2">
-                <a href="{{ url_for('main.home') }}" class="text-decoration-none">
-                    <div class="h-100" style="background: {% if not request.args.get('property_type') %}rgba(255,215,0,0.25){% else %}rgba(255,255,255,0.09){% endif %}; backdrop-filter: blur(12px); border: 1px solid {% if not request.args.get('property_type') %}#FFD700{% else %}rgba(255,255,255,0.15){% endif %}; border-radius: 16px; padding: 14px 8px;">
-                        <i class="bi bi-grid" style="font-size: 1.6rem; color: #FFD700;"></i>
-                        <h6 class="mt-1 mb-0" style="color: white; font-weight: 800; font-size: 0.9rem;">الكل</h6>
-                        <small style="color: rgba(255,255,255,0.7); font-size: 0.72rem;">{{ properties.total }} عقار</small>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-2">
-                <a href="{{ url_for('main.home', property_type='شقة') }}" class="text-decoration-none">
-                    <div class="h-100" style="background: {% if request.args.get('property_type') == 'شقة' %}rgba(255,215,0,0.25){% else %}rgba(255,255,255,0.09){% endif %}; backdrop-filter: blur(12px); border: 1px solid {% if request.args.get('property_type') == 'شقة' %}#FFD700{% else %}rgba(255,255,255,0.15){% endif %}; border-radius: 16px; padding: 14px 8px;">
-                        <i class="bi bi-building" style="font-size: 1.6rem; color: #FFD700;"></i>
-                        <h6 class="mt-1 mb-0" style="color: white; font-weight: 800; font-size: 0.9rem;">شقق</h6>
-                        {% if min_prices is defined and min_prices and min_prices.get('شقة') and min_prices.get('شقة').price is not none %}
-                        <small style="color: rgba(255,255,255,0.7); font-size: 0.72rem;">من {{ "{:,.0f}".format(min_prices['شقة'].price) }} ج.م</small>
-                        {% else %}
-                        <small style="color: rgba(255,255,255,0.5); font-size: 0.72rem;">تصفح الآن</small>
-                        {% endif %}
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-2">
-                <a href="{{ url_for('main.home', property_type='فيلا') }}" class="text-decoration-none">
-                    <div class="h-100" style="background: {% if request.args.get('property_type') == 'فيلا' %}rgba(255,215,0,0.25){% else %}rgba(255,255,255,0.09){% endif %}; backdrop-filter: blur(12px); border: 1px solid {% if request.args.get('property_type') == 'فيلا' %}#FFD700{% else %}rgba(255,255,255,0.15){% endif %}; border-radius: 16px; padding: 14px 8px;">
-                        <i class="bi bi-house-heart" style="font-size: 1.6rem; color: #FFD700;"></i>
-                        <h6 class="mt-1 mb-0" style="color: white; font-weight: 800; font-size: 0.9rem;">فلل</h6>
-                        {% if min_prices is defined and min_prices and min_prices.get('فيلا') and min_prices.get('فيلا').price is not none %}
-                        <small style="color: rgba(255,255,255,0.7); font-size: 0.72rem;">من {{ "{:,.0f}".format(min_prices['فيلا'].price) }} ج.م</small>
-                        {% else %}
-                        <small style="color: rgba(255,255,255,0.5); font-size: 0.72rem;">تصفح الآن</small>
-                        {% endif %}
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="{{ url_for('main.home', property_type='أرض') }}" class="text-decoration-none">
-                    <div class="h-100" style="background: {% if request.args.get('property_type') == 'أرض' %}rgba(255,215,0,0.25){% else %}rgba(255,255,255,0.09){% endif %}; backdrop-filter: blur(12px); border: 1px solid {% if request.args.get('property_type') == 'أرض' %}#FFD700{% else %}rgba(255,255,255,0.15){% endif %}; border-radius: 16px; padding: 14px 8px;">
-                        <i class="bi bi-map" style="font-size: 1.6rem; color: #FFD700;"></i>
-                        <h6 class="mt-1 mb-0" style="color: white; font-weight: 800; font-size: 0.9rem;">أراضي</h6>
-                        {% if min_prices is defined and min_prices and min_prices.get('أرض') and min_prices.get('أرض').price is not none %}
-                        <small style="color: rgba(255,255,255,0.7); font-size: 0.72rem;">من {{ "{:,.0f}".format(min_prices['أرض'].price) }} ج.م</small>
-                        {% else %}
-                        <small style="color: rgba(255,255,255,0.5); font-size: 0.72rem;">تصفح الآن</small>
-                        {% endif %}
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="{{ url_for('main.home', property_type='محل') }}" class="text-decoration-none">
-                    <div class="h-100" style="background: {% if request.args.get('property_type') == 'محل' %}rgba(255,215,0,0.25){% else %}rgba(255,255,255,0.09){% endif %}; backdrop-filter: blur(12px); border: 1px solid {% if request.args.get('property_type') == 'محل' %}#FFD700{% else %}rgba(255,255,255,0.15){% endif %}; border-radius: 16px; padding: 14px 8px;">
-                        <i class="bi bi-shop" style="font-size: 1.6rem; color: #FFD700;"></i>
-                        <h6 class="mt-1 mb-0" style="color: white; font-weight: 800; font-size: 0.9rem;">محلات</h6>
-                        {% if min_prices is defined and min_prices and min_prices.get('محل') and min_prices.get('محل').price is not none %}
-                        <small style="color: rgba(255,255,255,0.7); font-size: 0.72rem;">من {{ "{:,.0f}".format(min_prices['محل'].price) }} ج.م</small>
-                        {% else %}
-                        <small style="color: rgba(255,255,255,0.5); font-size: 0.72rem;">تصفح الآن</small>
-                        {% endif %}
-                    </div>
-                </a>
-            </div>
+        <!-- تصفح حسب النوع - GLASS بدون اعداد -->
+        <div class="cat-glass-wrap">
+            <a href="{{ url_for('main.home') }}" class="cat-glass {% if not request.args.get('property_type') %}active{% endif %}">
+                <i class="bi bi-grid"></i><span>الكل</span>
+            </a>
+            <a href="{{ url_for('main.home', property_type='شقة') }}" class="cat-glass {% if request.args.get('property_type') == 'شقة' %}active{% endif %}">
+                <i class="bi bi-building"></i><span>شقق</span>
+            </a>
+            <a href="{{ url_for('main.home', property_type='فيلا') }}" class="cat-glass {% if request.args.get('property_type') == 'فيلا' %}active{% endif %}">
+                <i class="bi bi-house-heart"></i><span>فلل</span>
+            </a>
+            <a href="{{ url_for('main.home', property_type='أرض') }}" class="cat-glass {% if request.args.get('property_type') == 'أرض' %}active{% endif %}">
+                <i class="bi bi-map"></i><span>أراضي</span>
+            </a>
+            <a href="{{ url_for('main.home', property_type='محل') }}" class="cat-glass {% if request.args.get('property_type') == 'محل' %}active{% endif %}">
+                <i class="bi bi-shop"></i><span>محلات</span>
+            </a>
         </div>
     </div>
 </div>
@@ -162,7 +127,6 @@
     <div class="row">
         {% for property in properties.items %}
             <div class="col-md-4 mb-4">
-                {# === SEO SLUG LINK - جديد === #}
                 {% if property.slug %}
                 <a href="{{ url_for('main.property_by_slug', slug=property.slug) }}" class="text-decoration-none">
                 {% else %}
@@ -193,7 +157,6 @@
                                 <span><i class="bi bi-eye"></i> {{ property.views or 0 }}</span>
                             </div>
                             <h4 style="color: #1a237e; font-weight: 800;">{{ "{:,.0f}".format(property.price) }} جنيه</h4>
-                            {# === SEO URL PREVIEW FOR ADMIN === #}
                             {% if current_user.is_authenticated and current_user.is_owner %}
                             <small class="text-success" style="font-size:0.65rem; word-break: break-all;"><i class="bi bi-link-45deg"></i> /{{ property.slug or property.id }}</small>
                             {% endif %}
@@ -203,8 +166,6 @@
             </div>
         {% endfor %}
     </div>
-
-    <!-- ===== PAGINATION - محافظ على الفلتر ===== -->
     {% if properties.pages > 1 %}
     <div class="d-flex justify-content-center mt-4 mb-5">
         <nav><ul class="pagination">
