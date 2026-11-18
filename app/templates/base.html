@@ -25,6 +25,91 @@
 .flash-info{background:#cff4fc;color:#055160;border:1px solid #b6effb}
 .btn-add{background:#0d6efd;color:white;font-weight:800;border-radius:20px;padding:6px 18px}
 </style>
+
+<!-- ===== تحسين الموبايل فقط - Star House 2026 - مش بيأثر على اللاب ===== -->
+<style>
+@media (max-width: 768px) {
+  /* 1. العنوان الرئيسي - "اعثر على منزل أحلامك" */
+  h1, .hero-title, .display-4 {
+    font-size: 28px !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+    margin-bottom: 8px !important;
+    padding: 0 12px !important;
+  }
+  h1 span, .hero-title span {
+    font-size: 26px !important;
+    display: block !important;
+  }
+  .hero-subtitle, .lead {
+    font-size: 15px !important;
+    text-align: center !important;
+    padding: 0 16px !important;
+    line-height: 1.6 !important;
+    opacity: 0.85 !important;
+  }
+
+  /* 2. البحث - يطلع فوق وواضح */
+  .search-bar, .search-box, form[action*="search"] {
+    position: sticky !important;
+    top: 60px !important;
+    z-index: 100 !important;
+    background: white !important;
+    border-radius: 50px !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    padding: 8px !important;
+    margin: 12px 12px 16px 12px !important;
+  }
+  .search-bar input, .search-box input, input[placeholder*="ابحث"] {
+    font-size: 16px !important;
+    padding: 12px 16px !important;
+    border-radius: 50px !important;
+    width: 100% !important;
+  }
+
+  /* 3. الكروت - شقق - فلل - أراضي - محلات - الكل */
+  .card, .category-card {
+    border-radius: 20px !important;
+    margin-bottom: 12px !important;
+  }
+  .card-body, .category-card {
+    padding: 16px 12px !important;
+    text-align: center !important;
+  }
+  .card-body h5, .card-title, .category-card h5 {
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    margin-bottom: 4px !important;
+  }
+  .card-body p, .card-text, .category-card p {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+  }
+  .card-body i, .category-card i {
+    font-size: 32px !important;
+    margin-bottom: 8px !important;
+  }
+  .card.active, .category-card.active {
+    border: 2px solid #FFD700 !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3) !important;
+    transform: scale(1.02) !important;
+  }
+  .navbar, header {
+    padding: 8px 12px !important;
+  }
+  .navbar-brand {
+    font-size: 20px !important;
+  }
+  .container, .container-fluid {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  .btn {
+    min-height: 44px !important;
+    border-radius: 12px !important;
+  }
+}
+</style>
 </head>
 <body style="background:#f8f9fa;">
 {% with messages = get_flashed_messages(with_categories=true) %}
