@@ -16,13 +16,12 @@
 
             <form method="POST" action="{{ url_for('main.login') }}" autocomplete="off">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <!-- حقول وهمية تخدع المتصفح - متظهرش -->
-                <input type="text" style="display:none">
-                <input type="password" style="display:none">
+                <input type="text" style="display:none" autocomplete="off">
+                <input type="password" style="display:none" autocomplete="off">
 
                 <div class="mb-3">
                     <label class="form-label">رقم الموبايل</label>
-                    <input type="text" name="identifier" class="form-control" value="" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="">
+                    <input type="text" id="loginPhoneInput" name="identifier" class="form-control" value="" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="01xxxxxxxxx">
                 </div>
 
                 <div class="mb-3">
@@ -30,6 +29,9 @@
                     <input type="password" name="password" class="form-control" value="" autocomplete="new-password" placeholder="">
                 </div>
 
+                <div style="text-align:left; margin:8px 0;">
+                  <a href="javascript:void(0)" onclick="goForgot()" style="color:#0d2a54; font-size:14px; text-decoration:underline;">نسيت كلمة السر؟</a>
+                </div>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary btn-lg">تسجيل الدخول</button>
                 </div>
@@ -40,4 +42,14 @@
         </div>
     </div>
 </div>
+<script>
+function goForgot(){
+  var phone = document.getElementById("loginPhoneInput").value.trim();
+  if(phone && phone.length >= 11){
+    window.location.href = "/forgot-password/?phone=" + encodeURIComponent(phone);
+  } else {
+    window.location.href = "/forgot-password/";
+  }
+}
+</script>
 {% endblock %}

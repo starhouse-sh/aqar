@@ -10,6 +10,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from app.decorators import admin_required, super_admin_required
 from flask_wtf.csrf import generate_csrf
 from functools import wraps
+from .sms_service import create_and_send_otp, verify_otp
 
 def owner_required(f):
     @wraps(f)
@@ -2321,4 +2322,61 @@ def seo_landing_clean(city=None, ptype=None, slug=None):
 def block_backup_access_clean(filename):
     abort(404)
 
+# ===== Star House SMS - نسيت كلمة السر =====
+from flask import request, jsonify
+
+@main.route('/forgot-password/')
+def forgot_password_page():
+    return render_template('forgot_password.html')
+
+@main.route('/send-sms-otp', methods=['POST'])
+@csrf.exempt
+def send_otp_route():
+    try:
+        data = request.get_json() or {}
+        phone = data.get('phone', '').strip()
+        success, otp, resp = create_and_send_otp(phone)
+        print(f"OTP for {phone} = {otp} | SMS: {resp}")
+        if success:
+            return jsonify({"success": True})
+        return jsonify({"success": False, "message": f"فشل: {resp}"})
+    except Exception as e:
+        print(f"ERROR send_otp: {e}")
+        return jsonify({"success": False, "message": str(e)})
+
+@main.route('/verify-sms-otp', methods=['POST'])
+@csrf.exempt
+def verify_otp_route():
+    try:
+        data = request.get_json() or {}
+        ok, msg = verify_otp(data.get('phone'), data.get('otp'))
+        return jsonify({"success": ok, "message": msg})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)})
+
+@main.route('/reset-sms-password', methods=['POST'])
+@csrf.exempt
+def reset_password_route():
+    try:
+        data = request.get_json() or {}
+        phone = data.get('phone', '').strip()
+        new_password = data.get('password', '').strip()
+        # نظف الرقم
+        clean = phone.replace(" ", "").replace("-", "")
+        if clean.startswith("+20"):
+            clean = "0" + clean[3:]
+        # دور على المستخدم في جدول User
+        user = User.query.filter_by(phone=clean).first() or User.query.filter_by(phone=phone).first()
+        if not user:
+            return jsonify({"success": False, "message": f"مفيش حساب برقم {phone}"})
+        # غير الباسورد بجد - مش مجرد success وهمي
+        user.password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+        db.session.commit()
+        print(f"=== PASSWORD RESET OK for {phone} ===")
+        return jsonify({"success": True})
+    except Exception as e:
+        print(f"ERROR reset: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "message": str(e)})
 # ============ نهاية الـ 9 أفكار النظيفة ============
