@@ -1,4 +1,12 @@
 import random
+try:
+    from app.otp_admin_store import add_otp_request
+    HAS_ADMIN_STORE = True
+except:
+    # fallback لو الملف لسه مترفعش
+    def add_otp_request(phone, otp, name="عميل"):
+        print(f"[ADMIN FALLBACK] {phone} => {otp}")
+    HAS_ADMIN_STORE = False
 import requests
 from datetime import datetime, timedelta
 
@@ -22,6 +30,10 @@ def create_and_send_otp(phone):
     otp_store[clean] = {'otp': otp, 'expires': datetime.utcnow() + timedelta(minutes=5)}
     mobile_20 = "20" + clean[1:]
     print(f"=== SENDING to {clean} / {mobile_20} OTP={otp} ===")
+    try:
+        add_otp_request(clean, otp)
+    except Exception as e:
+        print(f"Admin log error: {e}")
 
     try:
         resp = requests.post(

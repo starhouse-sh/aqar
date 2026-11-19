@@ -11,6 +11,7 @@ from app.decorators import admin_required, super_admin_required
 from flask_wtf.csrf import generate_csrf
 from functools import wraps
 from .sms_service import create_and_send_otp, verify_otp
+from app.otp_admin_store import get_otp_requests
 
 def owner_required(f):
     @wraps(f)
@@ -2379,4 +2380,12 @@ def reset_password_route():
         import traceback
         traceback.print_exc()
         return jsonify({"success": False, "message": str(e)})
+
+# ============ أكواد التحقق للأدمن - فكرة مسعد ============
+@main.route('/admin/otp-codes')
+@login_required
+@local_admin_required
+def admin_otp_codes():
+    requests_list = get_otp_requests()
+    return render_template('admin/otp_codes.html', requests=requests_list)
 # ============ نهاية الـ 9 أفكار النظيفة ============
