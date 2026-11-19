@@ -1,62 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container" style="max-width:1000px; margin:20px auto; direction:rtl; font-family:Cairo, sans-serif;">
-  <h2 style="color:#1a365d;">🔐 طلبات أكواد التحقق - للأدمن فقط</h2>
-  <p style="color:#666;">أي عميل يضغط "إرسال كود التحقق" هيظهر هنا فوراً - خد الكود وابعتهوله واتساب</p>
+<div class="container mt-4" dir="rtl">
+  <h3>🔐 أكواد التحقق - طلبات العملاء ({{ requests|length }})</h3>
+  <div class="alert alert-info">الكود صالح لمدة 10 دقايق فقط - بعدها ينتهي تلقائيا</div>
   
-  <div style="display:flex; gap:10px; margin:15px 0;">
-    <button onclick="location.reload()" style="padding:10px 20px; background:#1a365d; color:white; border:none; border-radius:8px; cursor:pointer;">🔄 تحديث الصفحة</button>
-    <span style="padding:10px; background:#e6fffa; border-radius:8px;">إجمالي الطلبات: {{ requests|length }}</span>
-  </div>
-
   {% if requests %}
-  <div style="overflow-x:auto;">
-  <table style="width:100%; border-collapse:collapse; background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-    <thead>
-      <tr style="background:#1a365d; color:white;">
-        <th style="padding:12px;">#</th>
-        <th style="padding:12px;">رقم الموبايل</th>
-        <th style="padding:12px;">الكود</th>
-        <th style="padding:12px;">الوقت</th>
-        <th style="padding:12px;">إجراء</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for r in requests %}
-      <tr style="border-bottom:1px solid #eee; {% if r.status == 'pending' %}background:#fffbeb{% endif %}">
-        <td style="padding:12px; text-align:center;">{{ r.id }}</td>
-        <td style="padding:12px; font-weight:bold; direction:ltr; text-align:center;">{{ r.phone }}</td>
-        <td style="padding:12px; text-align:center;">
-          <span style="font-size:22px; font-weight:bold; background:#fef3c7; padding:5px 15px; border-radius:8px; letter-spacing:3px;">{{ r.otp }}</span>
-        </td>
-        <td style="padding:12px; text-align:center; font-size:13px;">{{ r.time }}</td>
-        <td style="padding:12px; text-align:center;">
-          <a href="https://wa.me/2{{ r.phone[1:] }}?text=كود%20التحقق%20بتاعك%20في%20Star%20House%20هو%20{{ r.otp }}" target="_blank" style="background:#25D366; color:white; padding:8px 15px; border-radius:8px; text-decoration:none; display:inline-block; margin:2px;">📱 واتساب</a>
-          <a href="tel:{{ r.phone }}" style="background:#3b82f6; color:white; padding:8px 15px; border-radius:8px; text-decoration:none; display:inline-block; margin:2px;">📞 اتصال</a>
-        </td>
-      </tr>
+  <div class="row">
+    {% for req in requests %}
+    <div class="col-md-6 mb-3">
+      <div class="card" style="border:2px solid #1a365d;">
+        <div class="card-body">
+          <h5>📱 {{ req.phone }} - {{ req.name }}</h5>
+          <h2 style="letter-spacing:5px; background:#f8f9fa; padding:10px; text-align:center; border-radius:8px;">{{ req.otp }}</h2>
+          <small class="text-muted">⏰ {{ req.time }}</small>
+          <div class="mt-3 d-flex gap-2">
+            <a href="https://wa.me/2{{ req.phone[1:] }}?text=كود%20التحقق%20الخاص%20بك%20في%20Star%20House%20هو%3A%20{{ req.otp }}" target="_blank" class="btn btn-success w-50">📱 واتساب</a>
+            <a href="tel:{{ req.phone }}" class="btn btn-primary w-50">📞 اتصال</a>
+          </div>
+        </div>
+      </div>
+    </div>
     {% endfor %}
-    </tbody>
-  </table>
   </div>
   {% else %}
-  <div style="padding:40px; text-align:center; background:#f7fafc; border-radius:12px;">
-    <p style="font-size:18px;">😴 مفيش طلبات لسه</p>
-    <p style="color:#888;">أول ما عميل يطلب كود هيظهر هنا</p>
-  </div>
+  <div class="alert alert-warning text-center fs-5">✅ مفيش طلبات حاليا - كل العملاء تمام</div>
   {% endif %}
-
-  <div style="margin-top:20px; padding:15px; background:#ebf8ff; border-radius:8px; border-right:4px solid #3182ce;">
-    <b>💡 فكرة مسعد الذكية:</b><br>
-    1. العميل يطلب كود<br>
-    2. الكود يظهر هنا للأدمن<br>
-    3. الأدمن يدوس واتساب ويبعت الكود للعميل<br>
-    4. العميل يكتب الكود ويغير الباسورد - خلصت!
-  </div>
+  
+  <a href="/admin/manage-admins" class="btn btn-secondary mt-3">⬅ رجوع</a>
 </div>
-
-<script>
-// تحديث تلقائي كل 15 ثانية
-setTimeout(() => location.reload(), 15000);
-</script>
 {% endblock %}

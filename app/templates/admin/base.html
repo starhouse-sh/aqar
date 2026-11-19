@@ -1,3 +1,169 @@
-{% extends "base.html" %}
-{% block content %}
-{% endblock %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<title>{% if title %}Star House - {{ title }}{% else %}Star House{% endif %}</title>
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#111827">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Star House">
+<link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+<style>
+.flash-container{position:fixed;top:15px;left:50%;transform:translateX(-50%);z-index:9999;width:90%;max-width:500px}
+.flash-msg{margin-bottom:8px;padding:10px 15px;border-radius:10px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:flex;justify-content:space-between;align-items:center}
+.flash-success{background:#d1e7dd;color:#0f5132;border:1px solid #badbcc}
+.flash-danger{background:#f8d7da;color:#842029;border:1px solid #f5c2c7}
+.flash-warning{background:#fff3cd;color:#664d03;border:1px solid #ffecb5}
+.flash-info{background:#cff4fc;color:#055160;border:1px solid #b6effb}
+/* ===== NAVBAR MODERN 2026 - SOLUTION 1 ===== */
+.navbar-modern{position:sticky;top:0;z-index:999;background:rgba(17,24,39,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08)}
+.navbar-modern .nav-link.btn-gold{color:#000000!important;background:#FDE68A!important;font-weight:900!important;opacity:1!important}
+.navbar-modern .nav-link{color:#D1D5DB!important;font-size:14px;font-weight:600;padding:8px 14px!important;border-radius:10px}
+.navbar-modern .nav-link:hover{color:#fff!important;background:rgba(255,255,255,.06)}
+.navbar-modern .nav-link.active{color:#fff!important;background:rgba(255,255,255,.09)}
+.btn-gold{background:#FDE68A!important;color:#000000!important;font-weight:900!important;border-radius:14px!important;padding:9px 22px!important;box-shadow:0 8px 20px rgba(253,230,138,.25);border:none!important}
+.btn-gold *{color:#000000!important}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(253,230,138,.35)}
+.mega-menu{width:580px;max-width:92vw;border:none;border-radius:18px;padding:14px;background:#1F2937;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.mega-item{display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:12px;color:#E5E7EB!important;text-decoration:none;font-size:13.5px;font-weight:600}
+.mega-item:hover{background:rgba(255,255,255,.07);color:#fff!important}
+.mega-item small{display:block;color:#9CA3AF;font-weight:400;font-size:11.5px}
+@keyframes otp-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+</style>
+<style>
+@media (max-width: 768px) {
+  h1,.hero-title,.display-4{font-size:28px!important;line-height:1.4!important;text-align:center!important;margin-bottom:8px!important;padding:0 12px!important}
+  h1 span,.hero-title span{font-size:26px!important;display:block!important}
+  .hero-subtitle,.lead{font-size:15px!important;text-align:center!important;padding:0 16px!important;line-height:1.6!important;opacity:.85!important}
+  .search-bar,.search-box,form[action*="search"]{position:sticky!important;top:60px!important;z-index:100!important;background:white!important;border-radius:50px!important;box-shadow:0 8px 25px rgba(0,0,0,.15)!important;padding:8px!important;margin:12px 12px 16px 12px!important}
+  .search-bar input,.search-box input,input[placeholder*="ابحث"]{font-size:16px!important;padding:12px 16px!important;border-radius:50px!important;width:100%!important}
+  .card,.category-card{border-radius:20px!important;margin-bottom:12px!important}
+  .card-body,.category-card{padding:16px 12px!important;text-align:center!important}
+  .card-body h5,.card-title,.category-card h5{font-size:17px!important;font-weight:700!important;margin-bottom:4px!important}
+  .card-body p,.card-text,.category-card p{font-size:13px!important;line-height:1.5!important}
+  .card-body i,.category-card i{font-size:32px!important;margin-bottom:8px!important}
+  .card.active,.category-card.active{border:2px solid #FFD700!important;box-shadow:0 0 20px rgba(255,215,0,.3)!important;transform:scale(1.02)!important}
+  .navbar,.navbar-modern header{padding:8px 12px!important}
+  .navbar-brand{font-size:20px!important}
+  .container,.container-fluid{padding-left:12px!important;padding-right:12px!important}
+  .btn{min-height:44px!important;border-radius:12px!important}
+}
+</style>
+</head>
+<body style="background:#f8f9fa;">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container" id="flashContainer">
+    {% for category, message in messages[-2:] %}
+    <div class="flash-msg flash-{{ category }}"><span>{{ message }}</span><button style="background:none;border:none;" onclick="this.parentElement.remove()">✕</button></div>
+    {% endfor %}
+  </div>
+  <script>setTimeout(function(){const c=document.getElementById('flashContainer');if(c){c.style.opacity='0';setTimeout(()=>c.remove(),500);}},2500);</script>
+  {% endif %}
+{% endwith %}
+
+<!-- ===== NAVBAR MODERN 1 - MINIMAL LUXURY ===== -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-modern sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
+      <span style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#FDE68A,#F59E0B);display:flex;align-items:center;justify-content:center;color:#111827;font-size:20px;">★</span>
+      Star House
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link active" href="{{ url_for('main.home') }}">الرئيسية</a></li>
+        {% if current_user.is_authenticated and (current_user.role in ['admin','super_admin'] or current_user.is_owner) %}
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.offices_list_public') }}">🏢 المكاتب</a></li>
+        {% endif %}
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.interactive_map_clean') }}" style="color:#FFD700!important;">🗺 الخريطة</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.home') }}#properties">العقارات</a></li>
+        <!-- المزيد -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">المزيد ▼</a>
+          <div class="dropdown-menu mega-menu">
+            <div class="row g-1">
+              <div class="col-6 col-md-4"><a class="mega-item" href="{{ url_for('main.reels_page') }}">🎬<span>ريلز<small>فيديوهات العقارات</small></span></a></div>
+              <div class="col-6 col-md-4"><a class="mega-item" href="{{ url_for('main.packages_page') }}">💎<span>الباقات<small>باقات المكاتب</small></span></a></div>
+              <div class="col-6 col-md-4"><a class="mega-item" href="{{ url_for('main.wanted_list_clean') }}">🔎<span>مطلوب<small>اطلب عقارك</small></span></a></div>
+              <div class="col-6 col-md-4"><a class="mega-item" href="{{ url_for('main.favorites') }}">❤<span>المفضلة<small>عقاراتك المحفوظة</small></span></a></div>
+              <div class="col-6 col-md-4"><a class="mega-item" href="{{ url_for('main.compare_page') }}">⚖<span>مقارنة<small>قارن بين عقارين</small></span></a></div>
+              <div class="col-6 col-md-4"><a class="mega-item" href="{{ url_for('main.advanced_search') }}">🔍<span>بحث متقدم<small>فلترة دقيقة</small></span></a></div>
+              <div class="col-6 col-md-4"><a class="mega-item" href="{{ url_for('main.mortgage_page_final') }}">🏦<span>تمويل<small>تمويل عقاري</small></span></a></div>
+              <div class="col-6 col-md-4"><a class="mega-item" href="{{ url_for('main.finishing_page_final') }}">🎨<span>تشطيب<small>تشطيب وديكور</small></span></a></div>
+              <div class="col-6 col-md-4"><a class="mega-item" href="{{ url_for('main.estimate_price') }}">💰<span>تقدير سعر<small>اعرف سعر عقارك</small></span></a></div>
+            </div>
+          </div>
+        </li>
+        {% if current_user.is_authenticated %}
+          {% if current_user.role in ['admin','super_admin'] or current_user.is_owner %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" style="color:#FFD700!important;font-weight:700;">📊 لوحة التحكم</a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard') }}">📊 الرئيسية</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.offices_list') }}">🏢 إدارة المكاتب</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.admin_leads') }}">📞 العملاء المحتملين</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.commissions_list') }}">💰 العمولات 2.5%</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.tasks_list_new20') }}">📋 المهام</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.team_management') }}">👥 الفرق</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.chat_list') }}">💬 شات الموظفين</a></li>
+                {% if current_user.is_owner %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.backup_db') }}" style="color:green;font-weight:bold;">💾 نسخ احتياطي</a></li>
+                {% endif %}
+              </ul>
+            </li>
+            {% if current_user.is_owner or current_user.role == 'super_admin' or current_user.has_perm('can_add_admin') %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.manage_admins') }}" style="background:#FFD700;color:#1a237e;border-radius:8px;margin:2px 5px;font-weight:800;">👑 المشرفين</a></li>
+            {% endif %}
+
+            
+          {% endif %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.my_ads') }}">📄 إعلاناتي</a></li>
+          <!-- ===== زرار أكواد التحقق - فكرة مسعد - جنب إعلاناتي ===== -->
+          {% if current_user.role in ['admin','super_admin'] or current_user.is_owner %}
+          <li class="nav-item">
+            <a class="nav-link position-relative" href="{{ url_for('main.admin_otp_codes') }}" style="background:#FFD700;color:#1a237e!important;border-radius:8px;margin:2px 5px;font-weight:800;">
+              🔐 أكواد
+              {% if otp_pending_count|default(0) > 0 %}
+              <span style="position:absolute;top:-8px;right:-8px;background:#dc3545;color:white;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;border:2px solid white;padding:0 4px;animation: otp-pulse 1s infinite;">{{ otp_pending_count }}</span>
+              {% endif %}
+            </a>
+          </li>
+          {% endif %}
+          <!-- ===== نهاية زرار الأكواد ===== -->
+        {% endif %}
+      </ul>
+      <ul class="navbar-nav align-items-lg-center">
+        {% if current_user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.notifications') }}">🔔</a></li>
+          <li class="nav-item"><a class="nav-link btn btn-gold ms-2" href="{{ url_for('main.create_property') }}">➕ إضافة عقار</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.logout') }}">خروج</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link btn btn-gold ms-2" href="{{ url_for('main.create_property') }}">➕ إضافة عقار</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.login') }}">دخول</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.register') }}">تسجيل</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+{% block content %}{% endblock %}
+<footer class="bg-dark text-light text-center py-3 mt-5"><div>⭐ Star House | <a href="/privacy" class="text-warning">الخصوصية</a> - <a href="/terms" class="text-warning">الشروط</a></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<button id="installBtn" class="btn btn-warning" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9999; border-radius:20px; font-weight:800; box-shadow:0 4px 15px rgba(0,0,0,0.3);">📱 ثبت التطبيق</button>
+<script>
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/static/sw.js'); }
+let deferredPrompt; const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block'; });
+installBtn.addEventListener('click', async () => { if (!deferredPrompt) return; deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') installBtn.style.display = 'none'; deferredPrompt = null; });
+window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
+</script>
+</body>
+</html>

@@ -2388,4 +2388,25 @@ def reset_password_route():
 def admin_otp_codes():
     requests_list = get_otp_requests()
     return render_template('admin/otp_codes.html', requests=requests_list)
+
+
+# ضيف الكود ده في ملف app/__init__.py بعد سطر app = Flask(__name__)
+# أو في ملف app/routes.py بعد الـ imports
+
+from flask_login import current_user
+
+@main.context_processor
+def inject_otp_count():
+    try:
+        if current_user.is_authenticated and (getattr(current_user, 'is_owner', False) or getattr(current_user, 'role', '') in ['admin', 'super_admin']):
+            from app.otp_admin_store import get_pending_count
+            return {'otp_pending_count': get_pending_count()}
+    except:
+        pass
+    return {'otp_pending_count': 0}
+
+# لو بتستخدم Blueprints (main) استخدم:
+# @main.context_processor
+# def inject_otp_count(): ... نفس الكود
+
 # ============ نهاية الـ 9 أفكار النظيفة ============

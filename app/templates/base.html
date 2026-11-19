@@ -22,15 +22,18 @@
 .flash-info{background:#cff4fc;color:#055160;border:1px solid #b6effb}
 /* ===== NAVBAR MODERN 2026 - SOLUTION 1 ===== */
 .navbar-modern{position:sticky;top:0;z-index:999;background:rgba(17,24,39,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08)}
+.navbar-modern .nav-link.btn-gold{color:#000000!important;background:#FDE68A!important;font-weight:900!important;opacity:1!important}
 .navbar-modern .nav-link{color:#D1D5DB!important;font-size:14px;font-weight:600;padding:8px 14px!important;border-radius:10px}
 .navbar-modern .nav-link:hover{color:#fff!important;background:rgba(255,255,255,.06)}
 .navbar-modern .nav-link.active{color:#fff!important;background:rgba(255,255,255,.09)}
-.btn-gold{background:#FDE68A!important;color:#111827!important;font-weight:800!important;border-radius:14px!important;padding:9px 22px!important;box-shadow:0 8px 20px rgba(253,230,138,.25);border:none!important}
+.btn-gold{background:#FDE68A!important;color:#000000!important;font-weight:900!important;border-radius:14px!important;padding:9px 22px!important;box-shadow:0 8px 20px rgba(253,230,138,.25);border:none!important}
+.btn-gold *{color:#000000!important}
 .btn-gold:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(253,230,138,.35)}
 .mega-menu{width:580px;max-width:92vw;border:none;border-radius:18px;padding:14px;background:#1F2937;box-shadow:0 24px 60px rgba(0,0,0,.5)}
 .mega-item{display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:12px;color:#E5E7EB!important;text-decoration:none;font-size:13.5px;font-weight:600}
 .mega-item:hover{background:rgba(255,255,255,.07);color:#fff!important}
 .mega-item small{display:block;color:#9CA3AF;font-weight:400;font-size:11.5px}
+@keyframes otp-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
 </style>
 <style>
 @media (max-width: 768px) {
@@ -75,7 +78,9 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto align-items-lg-center">
         <li class="nav-item"><a class="nav-link active" href="{{ url_for('main.home') }}">الرئيسية</a></li>
+        {% if current_user.is_authenticated and (current_user.role in ['admin','super_admin'] or current_user.is_owner) %}
         <li class="nav-item"><a class="nav-link" href="{{ url_for('main.offices_list_public') }}">🏢 المكاتب</a></li>
+        {% endif %}
         <li class="nav-item"><a class="nav-link" href="{{ url_for('main.interactive_map_clean') }}" style="color:#FFD700!important;">🗺 الخريطة</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('main.home') }}#properties">العقارات</a></li>
         <!-- المزيد -->
@@ -116,8 +121,22 @@
             {% if current_user.is_owner or current_user.role == 'super_admin' or current_user.has_perm('can_add_admin') %}
             <li class="nav-item"><a class="nav-link" href="{{ url_for('main.manage_admins') }}" style="background:#FFD700;color:#1a237e;border-radius:8px;margin:2px 5px;font-weight:800;">👑 المشرفين</a></li>
             {% endif %}
+
+            
           {% endif %}
           <li class="nav-item"><a class="nav-link" href="{{ url_for('main.my_ads') }}">📄 إعلاناتي</a></li>
+          <!-- ===== زرار أكواد التحقق - فكرة مسعد - جنب إعلاناتي ===== -->
+          {% if current_user.role in ['admin','super_admin'] or current_user.is_owner %}
+          <li class="nav-item">
+            <a class="nav-link position-relative" href="{{ url_for('main.admin_otp_codes') }}" style="background:#FFD700;color:#1a237e!important;border-radius:8px;margin:2px 5px;font-weight:800;">
+              🔐 أكواد
+              {% if otp_pending_count|default(0) > 0 %}
+              <span style="position:absolute;top:-8px;right:-8px;background:#dc3545;color:white;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;border:2px solid white;padding:0 4px;animation: otp-pulse 1s infinite;">{{ otp_pending_count }}</span>
+              {% endif %}
+            </a>
+          </li>
+          {% endif %}
+          <!-- ===== نهاية زرار الأكواد ===== -->
         {% endif %}
       </ul>
       <ul class="navbar-nav align-items-lg-center">
