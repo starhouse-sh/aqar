@@ -1,21 +1,29 @@
+import os
 import random
+import requests
+from datetime import datetime, timedelta
+
+# === حماية البيانات من .env ===
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except:
+    pass
+
 try:
     from app.otp_admin_store import add_otp_request
     HAS_ADMIN_STORE = True
 except:
-    # fallback لو الملف لسه مترفعش
     def add_otp_request(phone, otp, name="عميل"):
         print(f"[ADMIN FALLBACK] {phone} => {otp}")
     HAS_ADMIN_STORE = False
-import requests
-from datetime import datetime, timedelta
 
 otp_store = {}
 
-# === البيانات الصحيحة النهائية ===
-API_USERNAME = "6f2c14b0-6e2a-4ce2-9c64-ec2b15471612"
-API_PASSWORD = "212577447e1492658a79c6f18d98592e9f23f9953b2b162e08efca61e6999b18"
-SENDER_TOKEN = "b611afb996655a94c8e942a823f1421de42bf8335d24ba1f84c437b2ab11ca27"
+# === قراءة من Environment بدل ما تبقى مكشوفة ===
+API_USERNAME = os.getenv("SMS_API_USERNAME", "")
+API_PASSWORD = os.getenv("SMS_API_PASSWORD", "")
+SENDER_TOKEN = os.getenv("SMS_SENDER_TOKEN", "")
 
 def create_and_send_otp(phone):
     clean = phone.strip().replace(" ", "").replace("-", "")
@@ -35,6 +43,11 @@ def create_and_send_otp(phone):
     except Exception as e:
         print(f"Admin log error: {e}")
 
+    # لو مفيش بيانات SMS هنشتغل محلي
+    if not API_USERNAME or not API_PASSWORD:
+        print("No SMS creds in env - using local fallback")
+        return True, otp, f"تم (محلي - مفيش بيانات SMS) - الكود: {otp}"
+
     try:
         resp = requests.post(
             "https://smsmisr.com/api/SMS/",
@@ -53,17 +66,12 @@ def create_and_send_otp(phone):
         if "1901" in resp.text:
             return True, otp, f"تم الارسال بنجاح - الكود: {otp}"
         if "1903" in resp.text:
-            # حتى لو الباسورد فيه مشكلة على السيرفر، خلي الموقع يشتغل بالكود المحلي
             return True, otp, f"تم (محلي) - الكود: {otp} - ملاحظة: رد الشركة {resp.text[:100]}"
         if "1902" in resp.text:
             return True, otp, f"تم (محلي) - مفيش رصيد لكن الكود: {otp}"
-        # اي رد تاني نعتبره نجاح محلي عشان الموقع يشتغل
         return True, otp, f"تم - الكود: {otp}"
 
     except Exception as e:
-        # === ده الحل لمشكلة PythonAnywhere 403 Forbidden ===
-        # PythonAnywhere المجاني بيمنع smsmisr.com
-        # فحتى لو فشل الاتصال، بنرجع True والكود يشتغل محلي
         print(f"Proxy/Connection Error (PythonAnywhere free): {e}")
         print(f"FALLBACK: Using local OTP {otp} for {clean}")
         return True, otp, f"تم (وضع تجريبي - PythonAnywhere المجاني بيمنع SMS) - الكود: {otp}"
