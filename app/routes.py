@@ -2405,6 +2405,27 @@ def inject_otp_count():
         pass
     return {'otp_pending_count': 0}
 
+@main.route('/robots.txt')
+def robots():
+    return send_from_directory('static', 'robots.txt')
+
+@main.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('static', 'sitemap.xml', mimetype='application/xml')
+
+
+
+# حط دول في app/routes.py في الآخر خالص
+from flask import send_from_directory
+import os
+
+@main.route('/google49c72784448150e3.html')
+def google_verify():
+    return "google-site-verification: google49c72784448150e3.html", 200, {'Content-Type': 'text/html'}
+
+# لو جوجل اداك اسم ملف تاني غير ده، غير الاسم هنا بنفس الاسم
+
+
 # لو بتستخدم Blueprints (main) استخدم:
 # @main.context_processor
 # def inject_otp_count(): ... نفس الكود

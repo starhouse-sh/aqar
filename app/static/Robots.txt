@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://starh.pythonanywhere.com/sitemap.xml

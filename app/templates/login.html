@@ -26,7 +26,11 @@
 
                 <div class="mb-3">
                     <label class="form-label">كلمة المرور</label>
-                    <input type="password" name="password" class="form-control" value="" autocomplete="new-password" placeholder="">
+                    <!-- خانة الباسورد مع زرار العين - تعديل مسعد -->
+                    <div class="input-group" style="max-width: 92%;">
+                        <input type="password" id="passwordField" name="password" class="form-control" value="" autocomplete="new-password" placeholder="" style="border-left:0;">
+                        <button type="button" class="btn btn-outline-secondary" id="togglePassword" style="background:white; border-color:#ced4da; min-width:45px; cursor:pointer;">👁️</button>
+                    </div>
                 </div>
 
                 <div style="text-align:left; margin:8px 0;">
@@ -51,5 +55,22 @@ function goForgot(){
     window.location.href = "/forgot-password/";
   }
 }
+
+// زرار العين - اظهار / اخفاء كلمة السر
+document.addEventListener('DOMContentLoaded', function(){
+  var pf = document.getElementById('passwordField');
+  var tb = document.getElementById('togglePassword');
+  if(tb && pf){
+    tb.addEventListener('click', function(){
+      if(pf.type === 'password'){
+        pf.type = 'text';
+        tb.textContent = '🙈';
+      } else {
+        pf.type = 'password';
+        tb.textContent = '👁️';
+      }
+    });
+  }
+});
 </script>
 {% endblock %}
